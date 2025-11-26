@@ -1,0 +1,775 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.card h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.instruction {
+    color: #666;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+/* Upload Section */
+.upload-area {
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #667eea;
+    background: #edf2f7;
+}
+
+.upload-area h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.option-description {
+    color: #718096;
+    font-size: 0.9em;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+.filename-display {
+    margin-top: 15px;
+    color: #667eea;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+.whisper-model-select {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.whisper-model-select label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.whisper-model-select select {
+    padding: 8px 15px;
+    border: 2px solid #667eea;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 5px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: #48bb78;
+    color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: #38a169;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+}
+
+.btn-secondary {
+    background: #718096;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4a5568;
+}
+
+.btn-danger {
+    background: #f56565;
+    color: white;
+    padding: 5px 15px;
+    font-size: 0.9em;
+}
+
+.btn-danger:hover {
+    background: #e53e3e;
+}
+
+.btn-large {
+    padding: 15px 40px;
+    font-size: 1.2em;
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Transcript Display */
+.transcript-box {
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+    line-height: 1.8;
+    font-size: 1.1em;
+    user-select: none; /* Prevent text selection to allow word selection */
+    cursor: default;
+    margin-bottom: 20px;
+}
+
+.transcript-box .word {
+    display: inline;
+    padding: 3px 5px;
+    margin: 0 2px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.transcript-box .word:hover:not(.highlighted) {
+    background: #e6f2ff;
+    transform: translateY(-1px);
+}
+
+.transcript-box .word.selected {
+    background: #ffd700;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.4);
+}
+
+.transcript-box .word.highlighted {
+    background: #90ee90;
+    font-weight: bold;
+    cursor: not-allowed;
+    box-shadow: 0 2px 4px rgba(144, 238, 144, 0.4);
+}
+
+/* Selection Controls */
+#selection-controls {
+    background: #edf2f7;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+#selection-controls h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+}
+
+#selected-text {
+    color: #667eea;
+    font-weight: bold;
+}
+
+.highlight-form {
+    margin-top: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2d3748;
+}
+
+/* Hidden file input */
+.hidden-file-input {
+    display: none;
+}
+
+/* File input wrapper */
+.file-input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.file-name-display {
+    color: #667eea;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+/* Custom select dropdown */
+.custom-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: white;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 40px;
+}
+
+.custom-select:hover {
+    border-color: #667eea;
+    background-color: #f7fafc;
+}
+
+.custom-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.custom-select option {
+    padding: 10px;
+    background-color: white;
+    color: #2d3748;
+}
+
+.form-group input[type="range"] {
+    width: 80%;
+    margin-right: 10px;
+}
+
+#volume-display {
+    font-weight: bold;
+    color: #667eea;
+}
+
+/* Highlights List */
+#highlights-list {
+    margin-bottom: 20px;
+}
+
+.subtitles-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.subtitles-header h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: white;
+}
+
+.subtitles-description {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.9em;
+    margin-top: 8px;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+.highlight-item {
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-left: 5px solid #667eea;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.highlight-item:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+.subtitle-badge {
+    background: #667eea;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-right: 15px;
+    min-width: 50px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.highlight-info {
+    flex: 1;
+}
+
+.subtitle-label {
+    font-size: 0.85em;
+    color: #667eea;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.highlight-phrase {
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    line-height: 1.4;
+}
+
+.highlight-details {
+    color: #718096;
+    font-size: 0.9em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.detail-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Progress Bar */
+.progress-bar {
+    background: #e2e8f0;
+    border-radius: 10px;
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    height: 100%;
+    width: 0%;
+    animation: progress 2s ease-in-out infinite;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #2d3748;
+    font-weight: bold;
+}
+
+@keyframes progress {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+}
+
+/* Result Section */
+#result-section {
+    text-align: center;
+}
+
+#result-message {
+    color: #48bb78;
+    font-size: 1.2em;
+    margin: 20px 0;
+}
+
+/* Step Header */
+.step-header {
+    margin-bottom: 15px;
+}
+
+.step-header h3 {
+    color: #5a67d8;
+    font-size: 1.3em;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Step Instructions */
+.step-instructions {
+    background: #f7fafc;
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #2d3748;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.step-instructions strong {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Step 2: Transcript Preview (Read-only) */
+.transcript-preview-container {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    line-height: 2;
+    font-size: 1.05em;
+}
+
+.subtitle-block {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.subtitle-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.subtitle-label-preview {
+    font-size: 0.9em;
+    color: #667eea;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.transcript-line {
+    margin-bottom: 0;
+    line-height: 1.8;
+}
+
+.preview-word {
+    display: inline;
+    color: #2d3748;
+    transition: background 0.2s ease;
+}
+
+.preview-word.highlighted {
+    background: #ffd700;
+    padding: 3px 5px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.preview-word.selecting {
+    background: #90EE90;
+    padding: 3px 5px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+/* Step 3: Transcript Text Container - Interactive Selection */
+.transcript-text-container {
+    background: white;
+    border: 3px solid #5a67d8;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    line-height: 2.2;
+    font-size: 1.05em;
+}
+
+/* Word Styling - Inline Display */
+.word-inline {
+    display: inline;
+    cursor: pointer;
+    user-select: none;
+    color: #2d3748;
+    transition: all 0.15s ease;
+    padding: 2px 0;
+}
+
+.word-inline:hover {
+    color: #5a67d8;
+    font-weight: 500;
+}
+
+.word-inline.selected {
+    background: #48bb78;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.word-inline.highlighted {
+    background: #ffd700;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Step 5: Music Selection - Word Styling */
+.word-inline-music {
+    display: inline;
+    cursor: pointer;
+    user-select: none;
+    color: #2d3748;
+    transition: all 0.15s ease;
+    padding: 2px 0;
+}
+
+.word-inline-music:hover {
+    color: #5a67d8;
+    font-weight: 500;
+}
+
+.word-inline-music.selected {
+    background: #48bb78;
+    color: white;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.word-inline-music.highlighted {
+    background: #ffd700;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.9em;
+}
+
+/* Music Section */
+.music-controls {
+    background: #f7fafc;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+}
+
+#selected-music-display {
+    background: #e6fffa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 4px solid #48bb78;
+}
+
+#selected-music-display p {
+    margin: 0;
+    color: #2d3748;
+}
+
+#selected-music-name {
+    color: #48bb78;
+    font-weight: bold;
+}
+
+/* Modal Popup Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 0;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: white;
+}
+
+.modal-close {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.modal-close:hover {
+    transform: scale(1.2);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-selected-text {
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #2d3748;
+    border-left: 4px solid #667eea;
+}
+
+.modal-selected-text span {
+    color: #667eea;
+    font-weight: bold;
+}
+
+.modal-upload-area {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border: 2px dashed #cbd5e0;
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2em;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+}

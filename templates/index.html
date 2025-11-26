@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Editor - Highlight & Subtitle Tool</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🎬 Video Editor</h1>
+        <p>
+          Upload your video, highlight words for subtitles, and add overlay
+          clips
+        </p>
+      </header>
+
+      <!-- Load Existing Project -->
+      <section class="card" id="load-project-section">
+        <h2>📂 Load Existing Project</h2>
+        <p class="instruction">
+          Load a previously saved project to continue editing or make changes.
+        </p>
+        <button class="btn btn-primary" id="load-project-btn">
+          📂 Load Project from S3
+        </button>
+        <div id="project-list-container" style="display: none; margin-top: 20px;">
+          <h3>Available Projects:</h3>
+          <div id="project-list" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
+            <!-- Projects will be listed here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 1: Upload Main Video -->
+      <section class="card" id="upload-section">
+        <h2>Step 1: Upload Video & Script</h2>
+
+        <!-- Video Upload -->
+        <div class="upload-area">
+          <h3>📹 Main Video</h3>
+          <input
+            type="file"
+            id="main-video-input"
+            accept="video/*"
+            style="display: none"
+          />
+          <button
+            class="btn btn-primary"
+            onclick="document.getElementById('main-video-input').click()"
+          >
+            Choose Video File
+          </button>
+          <p id="video-filename" class="filename-display"></p>
+        </div>
+
+        <!-- TXT Upload -->
+        <div class="upload-area" style="margin-top: 20px">
+          <h3>📄 Script/Transcript (TXT File)</h3>
+          <input
+            type="file"
+            id="transcript-file-input"
+            accept=".txt"
+            style="display: none"
+          />
+          <button
+            class="btn btn-primary"
+            onclick="document.getElementById('transcript-file-input').click()"
+          >
+            Choose TXT File
+          </button>
+          <p id="transcript-filename" class="filename-display"></p>
+          <p class="option-description">
+            ⚡ Upload a .txt file with your script. Words will be evenly
+            distributed across the video duration.
+          </p>
+        </div>
+
+        <button class="btn btn-success btn-large" id="upload-btn" disabled>
+          ⬆️ Upload & Continue
+        </button>
+        <div id="upload-progress" class="progress-bar" style="display: none">
+          <div class="progress-fill"></div>
+          <span class="progress-text">Processing...</span>
+        </div>
+      </section>
+
+      <!-- Step 2: Transcript Preview -->
+      <section
+        class="card"
+        id="transcript-preview-section"
+        style="display: none"
+      >
+        <h2>Step 2: Transcript Preview</h2>
+        <p class="instruction">
+          📄 Below is your transcript broken into lines. Highlighted words show
+          where you've added subtitles.
+        </p>
+        <div id="transcript-preview" class="transcript-box"></div>
+      </section>
+
+      <!-- Step 3: Select Text for Highlights -->
+      <section class="card" id="selection-section" style="display: none">
+        <h2>Step 3: Select Text for Highlights</h2>
+        <p class="instruction">
+          💡 <strong>How to select:</strong> Click and drag to select multiple
+          words, or click one word then Shift+Click another to select a range.
+        </p>
+
+        <div id="transcript-display" class="transcript-box"></div>
+
+        <div id="selection-controls" style="display: none">
+          <h3>Selected Text: "<span id="selected-text"></span>"</h3>
+          <div class="highlight-form">
+            <div class="form-group">
+              <label>Upload Clip for this highlight:</label>
+              <div class="file-input-wrapper">
+                <input
+                  type="file"
+                  id="clip-input"
+                  accept="video/*"
+                  class="hidden-file-input"
+                />
+                <button
+                  class="btn btn-primary"
+                  onclick="document.getElementById('clip-input').click()"
+                >
+                  📁 Choose File
+                </button>
+                <span id="clip-filename" class="file-name-display"></span>
+              </div>
+              <button class="btn btn-secondary" id="upload-clip-btn">
+                ⬆️ Upload
+              </button>
+            </div>
+            <div class="form-group">
+              <label>Or select existing clip:</label>
+              <select id="existing-clips" class="custom-select">
+                <option value="">-- Select existing file --</option>
+              </select>
+            </div>
+            <button class="btn btn-success" id="add-highlight-btn">
+              ✅ Add Highlight
+            </button>
+            <button class="btn btn-secondary" id="cancel-selection-btn">
+              ❌ Cancel
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 4: Review Your Clips -->
+      <section class="card" id="highlights-section" style="display: none">
+        <h2>Step 4: Review Your Clips</h2>
+        <p class="instruction">
+          Each clip below will appear in your video during the selected words.
+        </p>
+        <div id="highlights-list"></div>
+      </section>
+
+      <!-- Step 5: Select Text for Music/Audio -->
+      <section class="card" id="music-selection-section" style="display: none">
+        <h2>Step 5: Select Text for Music/Audio</h2>
+        <p class="instruction">
+          💡 <strong>How to select:</strong> Click and drag to select multiple
+          words, or click one word then Shift+Click another to select a range.
+        </p>
+
+        <div id="music-transcript-display" class="transcript-box"></div>
+
+        <div id="music-selection-controls" style="display: none">
+          <h3>Selected Text: "<span id="music-selected-text"></span>"</h3>
+          <div class="highlight-form">
+            <div class="form-group">
+              <label>Upload Audio/Music for this selection:</label>
+              <div class="file-input-wrapper">
+                <input
+                  type="file"
+                  id="music-input"
+                  accept="audio/*"
+                  class="hidden-file-input"
+                />
+                <button
+                  class="btn btn-primary"
+                  onclick="document.getElementById('music-input').click()"
+                >
+                  📁 Choose Audio File
+                </button>
+                <span id="music-filename" class="file-name-display"></span>
+              </div>
+              <button class="btn btn-secondary" id="upload-music-btn">
+                ⬆️ Upload
+              </button>
+            </div>
+            <div class="form-group">
+              <label>Or select existing audio:</label>
+              <select id="existing-music-select" class="custom-select">
+                <option value="">-- Select existing audio --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Audio Volume:</label>
+              <input
+                type="range"
+                id="music-volume"
+                min="0"
+                max="2"
+                step="0.1"
+                value="1.0"
+              />
+              <span id="music-volume-display">1.0</span>
+            </div>
+            <button class="btn btn-success" id="add-music-btn">
+              ✅ Add Music
+            </button>
+            <button class="btn btn-secondary" id="cancel-music-selection-btn">
+              ❌ Cancel
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 6: Review Your Music/Audio -->
+      <section class="card" id="music-highlights-section" style="display: none">
+        <h2>Step 6: Review Your Music/Audio</h2>
+        <p class="instruction">
+          Each audio/music below will play during the selected words.
+        </p>
+        <div id="music-highlights-list"></div>
+      </section>
+
+      <!-- Step 7: Process Video -->
+      <section class="card" id="process-section" style="display: none">
+        <h2>Step 7: Process Your Video</h2>
+        <p class="instruction">
+          Ready to create your final video? Select your preferred aspect ratio and click the button below to process.
+        </p>
+        
+        <!-- Save Project Button -->
+        <div style="margin: 20px 0; padding: 15px; background: #f0f8ff; border-radius: 5px; border: 1px solid #b0d4f1;">
+          <h3 style="margin-bottom: 10px; color: #2c5aa0;">💾 Save Project (Without Processing)</h3>
+          <p style="margin-bottom: 10px; color: #666; font-size: 0.9em;">
+            Save your current work to S3 so you can continue editing later. You can save at any time without processing the video.
+          </p>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input 
+              type="text" 
+              id="project-name-input" 
+              placeholder="Project name (optional)" 
+              style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+            />
+            <button class="btn btn-secondary" id="save-project-btn">
+              💾 Save Project to S3
+            </button>
+          </div>
+          <div id="save-project-status" style="margin-top: 10px; display: none;"></div>
+        </div>
+        
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+        
+        <div class="form-group" style="margin: 20px 0;">
+          <label for="aspect-ratio-select" style="display: block; margin-bottom: 10px; font-weight: bold;">
+            📐 Aspect Ratio:
+          </label>
+          <select id="aspect-ratio-select" class="custom-select" style="width: 100%; max-width: 300px; padding: 10px; font-size: 16px;">
+            <option value="4:5">4:5 (Square/Portrait - Instagram Post)</option>
+            <option value="9:16">9:16 (Vertical - Instagram Reels/TikTok)</option>
+          </select>
+          <p class="option-description" style="margin-top: 8px; font-size: 14px; color: #666;">
+            Choose the aspect ratio for your final video. The subtitle design will be automatically optimized for your selection.
+          </p>
+        </div>
+        
+        <button class="btn btn-primary btn-large" id="process-btn">
+          🎥 Process Video
+        </button>
+        <div id="process-progress" class="progress-bar" style="display: none">
+          <div class="progress-fill"></div>
+          <span class="progress-text"
+            >Processing video... This may take a while.</span
+          >
+        </div>
+      </section>
+
+      <!-- Step 8: Download Result -->
+      <section class="card" id="result-section" style="display: none">
+        <h2>✅ Video Processed Successfully!</h2>
+        <p id="result-message"></p>
+        
+        <!-- Video Preview -->
+        <div id="video-preview-container" style="margin: 20px 0; text-align: center;">
+          <h3 style="margin-bottom: 15px; color: #667eea;">📹 Video Preview</h3>
+          <video 
+            id="video-preview" 
+            controls 
+            style="max-width: 100%; max-height: 600px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); background: #000;"
+            preload="metadata"
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        
+        <div style="margin-top: 20px;">
+          <button class="btn btn-primary btn-large" id="go-back-btn" style="margin-right: 10px;">
+            ⬅️ Go Back & Make Changes
+          </button>
+          <button class="btn btn-success btn-large" id="download-btn">
+            ⬇️ Download Processed Video
+          </button>
+          <button class="btn btn-secondary" onclick="location.reload()" style="margin-left: 10px;">
+            🔄 Start New Project
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Video Upload Modal Popup -->
+    <div id="video-upload-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📹 Upload Video for Selected Text</h2>
+          <span class="modal-close" id="close-modal-btn">&times;</span>
+        </div>
+        <div class="modal-body">
+          <p class="modal-selected-text">
+            Selected text: "<span id="modal-selected-text"></span>"
+          </p>
+          <div class="modal-upload-area">
+            <input
+              type="file"
+              id="modal-video-input"
+              accept="video/*"
+              class="hidden-file-input"
+            />
+            <button
+              class="btn btn-primary"
+              onclick="document.getElementById('modal-video-input').click()"
+            >
+              📁 Choose Video File
+            </button>
+            <span id="modal-video-filename" class="file-name-display"></span>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-success" id="modal-upload-btn">
+              ⬆️ Upload & Attach
+            </button>
+            <button class="btn btn-secondary" id="modal-cancel-btn">
+              ❌ Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

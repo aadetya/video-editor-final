@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: video-editor-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server
+      --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - video-editor-network
+
+  video-editor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: video-editor-app
+    image: video-editor:latest
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      # Persistent data directories
+      - ./data/uploads:/app/uploads
+      - ./data/outputs:/app/outputs
+      - ./data/projects:/app/projects      # Critical for intelligent caching
+      - ./data/jobs:/app/jobs
+      - ./data/clips:/app/clips            # User uploads + defaults
+      - ./data/audio_files:/app/audio_files  # User uploads + defaults
+
+    environment:
+      # Storage configuration
+      - USE_S3_STORAGE=${USE_S3_STORAGE:-false}
+
+      # AWS S3 Configuration (only needed if USE_S3_STORAGE=true)
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-}
+
+      # Application settings
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - PYTHONUNBUFFERED=1
+
+      # Redis cache configuration
+      - USE_REDIS_CACHE=${USE_REDIS_CACHE:-false}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_DB=${REDIS_DB:-0}
+      - REDIS_CACHE_TTL=${REDIS_CACHE_TTL:-86400}
+
+    # GPU support - requires nvidia-docker2
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    restart: unless-stopped
+
+    # Increase shared memory for PyTorch/CUDA
+    shm_size: '2gb'
+
+    # Set hostname
+    hostname: video-editor
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:5000/', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    networks:
+      - video-editor-network
+
+# Volumes
+volumes:
+  redis_data:
+    driver: local
+
+# Networks
+networks:
+  video-editor-network:
+    driver: bridge
