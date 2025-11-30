@@ -1,0 +1,854 @@
+{
+  "project_info": {
+    "created_at": "2025-11-30T11:36:58.444377",
+    "video_path": "uploads/Video_Input_1.mp4",
+    "output_filename": "output_Video_Input_1.mp4",
+    "output_path": "outputs/output_Video_Input_1.mp4",
+    "aspect_ratio": "4:5"
+  },
+  "highlights": [
+    {
+      "phrase": "Independent crash testing showed",
+      "start_word": 18,
+      "end_word": 21,
+      "clip_path": "clips/4.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "those budget options fail catastrophically.",
+      "start_word": 22,
+      "end_word": 26,
+      "clip_path": "clips/20.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "The clips break.",
+      "start_word": 27,
+      "end_word": 29,
+      "clip_path": "clips/21.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "In the moment you need protection most,",
+      "start_word": 33,
+      "end_word": 39,
+      "clip_path": "clips/3.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "This is exactly why Baby Gaurd Belt was created.",
+      "start_word": 43,
+      "end_word": 51,
+      "clip_path": "clips/6.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "It's a crash tested, certified solution",
+      "start_word": 58,
+      "end_word": 63,
+      "clip_path": "clips/5.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "that clips onto your seat and positions",
+      "start_word": 64,
+      "end_word": 70,
+      "clip_path": "clips/7.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "your seatbelt safely below your belly.",
+      "start_word": 71,
+      "end_word": 76,
+      "clip_path": "clips/11.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "Away from your vulnerable baby.",
+      "start_word": 77,
+      "end_word": 81,
+      "clip_path": "clips/13.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "Because it's been tested.",
+      "start_word": 91,
+      "end_word": 94,
+      "clip_path": "clips/16.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "Because it works.",
+      "start_word": 95,
+      "end_word": 97,
+      "clip_path": "clips/15.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "so get yours to experience real peace of mind on the road.",
+      "start_word": 108,
+      "end_word": 119,
+      "clip_path": "clips/26.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    }
+  ],
+  "transcript": [
+    {
+      "end_time": 0.4043333333333334,
+      "start_time": 0,
+      "word": "﻿Do"
+    },
+    {
+      "end_time": 0.8086666666666668,
+      "start_time": 0.4043333333333334,
+      "word": "NOT"
+    },
+    {
+      "end_time": 1.213,
+      "start_time": 0.8086666666666668,
+      "word": "buy"
+    },
+    {
+      "end_time": 1.6173333333333335,
+      "start_time": 1.213,
+      "word": "the"
+    },
+    {
+      "end_time": 2.021666666666667,
+      "start_time": 1.6173333333333335,
+      "word": "cheap"
+    },
+    {
+      "end_time": 2.426,
+      "start_time": 2.021666666666667,
+      "word": "pregnancy"
+    },
+    {
+      "end_time": 2.8303333333333334,
+      "start_time": 2.426,
+      "word": "seatbelt"
+    },
+    {
+      "end_time": 3.2346666666666666,
+      "start_time": 2.8303333333333334,
+      "word": "adjusters."
+    },
+    {
+      "end_time": 3.639,
+      "start_time": 3.2346666666666666,
+      "word": "Seriously."
+    },
+    {
+      "end_time": 4.043333333333333,
+      "start_time": 3.639,
+      "word": "Let"
+    },
+    {
+      "end_time": 4.447666666666667,
+      "start_time": 4.043333333333333,
+      "word": "me"
+    },
+    {
+      "end_time": 4.852,
+      "start_time": 4.447666666666667,
+      "word": "save"
+    },
+    {
+      "end_time": 5.256333333333334,
+      "start_time": 4.852,
+      "word": "you"
+    },
+    {
+      "end_time": 5.660666666666668,
+      "start_time": 5.256333333333334,
+      "word": "from"
+    },
+    {
+      "end_time": 6.065000000000001,
+      "start_time": 5.660666666666668,
+      "word": "making"
+    },
+    {
+      "end_time": 6.469333333333335,
+      "start_time": 6.065000000000001,
+      "word": "a"
+    },
+    {
+      "end_time": 6.873666666666669,
+      "start_time": 6.469333333333335,
+      "word": "dangerous"
+    },
+    {
+      "end_time": 7.278000000000002,
+      "start_time": 6.873666666666669,
+      "word": "mistake."
+    },
+    {
+      "end_time": 7.682333333333336,
+      "start_time": 7.278000000000002,
+      "word": "Independent"
+    },
+    {
+      "end_time": 8.08666666666667,
+      "start_time": 7.682333333333336,
+      "word": "crash"
+    },
+    {
+      "end_time": 8.491000000000003,
+      "start_time": 8.08666666666667,
+      "word": "testing"
+    },
+    {
+      "end_time": 8.895333333333337,
+      "start_time": 8.491000000000003,
+      "word": "showed"
+    },
+    {
+      "end_time": 9.29966666666667,
+      "start_time": 8.895333333333337,
+      "word": "those"
+    },
+    {
+      "end_time": 9.704000000000004,
+      "start_time": 9.29966666666667,
+      "word": "budget"
+    },
+    {
+      "end_time": 10.108333333333338,
+      "start_time": 9.704000000000004,
+      "word": "options"
+    },
+    {
+      "end_time": 10.512666666666671,
+      "start_time": 10.108333333333338,
+      "word": "fail"
+    },
+    {
+      "end_time": 10.917000000000005,
+      "start_time": 10.512666666666671,
+      "word": "catastrophically."
+    },
+    {
+      "end_time": 11.321333333333339,
+      "start_time": 10.917000000000005,
+      "word": "The"
+    },
+    {
+      "end_time": 11.725666666666672,
+      "start_time": 11.321333333333339,
+      "word": "clips"
+    },
+    {
+      "end_time": 12.130000000000006,
+      "start_time": 11.725666666666672,
+      "word": "break."
+    },
+    {
+      "end_time": 12.53433333333334,
+      "start_time": 12.130000000000006,
+      "word": "The"
+    },
+    {
+      "end_time": 12.938666666666673,
+      "start_time": 12.53433333333334,
+      "word": "straps"
+    },
+    {
+      "end_time": 13.343000000000007,
+      "start_time": 12.938666666666673,
+      "word": "snap."
+    },
+    {
+      "end_time": 13.74733333333334,
+      "start_time": 13.343000000000007,
+      "word": "In"
+    },
+    {
+      "end_time": 14.151666666666674,
+      "start_time": 13.74733333333334,
+      "word": "the"
+    },
+    {
+      "end_time": 14.556000000000008,
+      "start_time": 14.151666666666674,
+      "word": "moment"
+    },
+    {
+      "end_time": 14.960333333333342,
+      "start_time": 14.556000000000008,
+      "word": "you"
+    },
+    {
+      "end_time": 15.364666666666675,
+      "start_time": 14.960333333333342,
+      "word": "need"
+    },
+    {
+      "end_time": 15.769000000000009,
+      "start_time": 15.364666666666675,
+      "word": "protection"
+    },
+    {
+      "end_time": 16.173333333333343,
+      "start_time": 15.769000000000009,
+      "word": "most,"
+    },
+    {
+      "end_time": 16.577666666666676,
+      "start_time": 16.173333333333343,
+      "word": "you"
+    },
+    {
+      "end_time": 16.98200000000001,
+      "start_time": 16.577666666666676,
+      "word": "have"
+    },
+    {
+      "end_time": 17.386333333333344,
+      "start_time": 16.98200000000001,
+      "word": "nothing."
+    },
+    {
+      "end_time": 17.790666666666677,
+      "start_time": 17.386333333333344,
+      "word": "This"
+    },
+    {
+      "end_time": 18.19500000000001,
+      "start_time": 17.790666666666677,
+      "word": "is"
+    },
+    {
+      "end_time": 18.599333333333345,
+      "start_time": 18.19500000000001,
+      "word": "exactly"
+    },
+    {
+      "end_time": 19.00366666666668,
+      "start_time": 18.599333333333345,
+      "word": "why"
+    },
+    {
+      "end_time": 19.408000000000012,
+      "start_time": 19.00366666666668,
+      "word": "Baby"
+    },
+    {
+      "end_time": 19.812333333333346,
+      "start_time": 19.408000000000012,
+      "word": "Gaurd"
+    },
+    {
+      "end_time": 20.21666666666668,
+      "start_time": 19.812333333333346,
+      "word": "Belt"
+    },
+    {
+      "end_time": 20.621000000000013,
+      "start_time": 20.21666666666668,
+      "word": "was"
+    },
+    {
+      "end_time": 21.025333333333347,
+      "start_time": 20.621000000000013,
+      "word": "created."
+    },
+    {
+      "end_time": 21.42966666666668,
+      "start_time": 21.025333333333347,
+      "word": "It's"
+    },
+    {
+      "end_time": 21.834000000000014,
+      "start_time": 21.42966666666668,
+      "word": "not"
+    },
+    {
+      "end_time": 22.238333333333347,
+      "start_time": 21.834000000000014,
+      "word": "just"
+    },
+    {
+      "end_time": 22.64266666666668,
+      "start_time": 22.238333333333347,
+      "word": "another"
+    },
+    {
+      "end_time": 23.047000000000015,
+      "start_time": 22.64266666666668,
+      "word": "pregnancy"
+    },
+    {
+      "end_time": 23.45133333333335,
+      "start_time": 23.047000000000015,
+      "word": "gadget."
+    },
+    {
+      "end_time": 23.855666666666682,
+      "start_time": 23.45133333333335,
+      "word": "It's"
+    },
+    {
+      "end_time": 24.260000000000016,
+      "start_time": 23.855666666666682,
+      "word": "a"
+    },
+    {
+      "end_time": 24.66433333333335,
+      "start_time": 24.260000000000016,
+      "word": "crash"
+    },
+    {
+      "end_time": 25.068666666666683,
+      "start_time": 24.66433333333335,
+      "word": "tested,"
+    },
+    {
+      "end_time": 25.473000000000017,
+      "start_time": 25.068666666666683,
+      "word": "certified"
+    },
+    {
+      "end_time": 25.87733333333335,
+      "start_time": 25.473000000000017,
+      "word": "solution"
+    },
+    {
+      "end_time": 26.281666666666684,
+      "start_time": 25.87733333333335,
+      "word": "that"
+    },
+    {
+      "end_time": 26.686000000000018,
+      "start_time": 26.281666666666684,
+      "word": "clips"
+    },
+    {
+      "end_time": 27.09033333333335,
+      "start_time": 26.686000000000018,
+      "word": "onto"
+    },
+    {
+      "end_time": 27.494666666666685,
+      "start_time": 27.09033333333335,
+      "word": "your"
+    },
+    {
+      "end_time": 27.89900000000002,
+      "start_time": 27.494666666666685,
+      "word": "seat"
+    },
+    {
+      "end_time": 28.303333333333352,
+      "start_time": 27.89900000000002,
+      "word": "and"
+    },
+    {
+      "end_time": 28.707666666666686,
+      "start_time": 28.303333333333352,
+      "word": "positions"
+    },
+    {
+      "end_time": 29.11200000000002,
+      "start_time": 28.707666666666686,
+      "word": "your"
+    },
+    {
+      "end_time": 29.516333333333353,
+      "start_time": 29.11200000000002,
+      "word": "seatbelt"
+    },
+    {
+      "end_time": 29.920666666666687,
+      "start_time": 29.516333333333353,
+      "word": "safely"
+    },
+    {
+      "end_time": 30.32500000000002,
+      "start_time": 29.920666666666687,
+      "word": "below"
+    },
+    {
+      "end_time": 30.729333333333354,
+      "start_time": 30.32500000000002,
+      "word": "your"
+    },
+    {
+      "end_time": 31.133666666666688,
+      "start_time": 30.729333333333354,
+      "word": "belly."
+    },
+    {
+      "end_time": 31.53800000000002,
+      "start_time": 31.133666666666688,
+      "word": "Away"
+    },
+    {
+      "end_time": 31.942333333333355,
+      "start_time": 31.53800000000002,
+      "word": "from"
+    },
+    {
+      "end_time": 32.346666666666685,
+      "start_time": 31.942333333333355,
+      "word": "your"
+    },
+    {
+      "end_time": 32.75100000000002,
+      "start_time": 32.346666666666685,
+      "word": "vulnerable"
+    },
+    {
+      "end_time": 33.15533333333335,
+      "start_time": 32.75100000000002,
+      "word": "baby."
+    },
+    {
+      "end_time": 33.559666666666686,
+      "start_time": 33.15533333333335,
+      "word": "Yes,"
+    },
+    {
+      "end_time": 33.96400000000002,
+      "start_time": 33.559666666666686,
+      "word": "this"
+    },
+    {
+      "end_time": 34.368333333333354,
+      "start_time": 33.96400000000002,
+      "word": "costs"
+    },
+    {
+      "end_time": 34.77266666666669,
+      "start_time": 34.368333333333354,
+      "word": "more."
+    },
+    {
+      "end_time": 35.17700000000002,
+      "start_time": 34.77266666666669,
+      "word": "Because"
+    },
+    {
+      "end_time": 35.581333333333355,
+      "start_time": 35.17700000000002,
+      "word": "it's"
+    },
+    {
+      "end_time": 35.98566666666669,
+      "start_time": 35.581333333333355,
+      "word": "actually"
+    },
+    {
+      "end_time": 36.39000000000002,
+      "start_time": 35.98566666666669,
+      "word": "engineered"
+    },
+    {
+      "end_time": 36.794333333333356,
+      "start_time": 36.39000000000002,
+      "word": "correctly."
+    },
+    {
+      "end_time": 37.19866666666669,
+      "start_time": 36.794333333333356,
+      "word": "Because"
+    },
+    {
+      "end_time": 37.60300000000002,
+      "start_time": 37.19866666666669,
+      "word": "it's"
+    },
+    {
+      "end_time": 38.00733333333336,
+      "start_time": 37.60300000000002,
+      "word": "been"
+    },
+    {
+      "end_time": 38.41166666666669,
+      "start_time": 38.00733333333336,
+      "word": "tested."
+    },
+    {
+      "end_time": 38.816000000000024,
+      "start_time": 38.41166666666669,
+      "word": "Because"
+    },
+    {
+      "end_time": 39.22033333333336,
+      "start_time": 38.816000000000024,
+      "word": "it"
+    },
+    {
+      "end_time": 39.62466666666669,
+      "start_time": 39.22033333333336,
+      "word": "works."
+    },
+    {
+      "end_time": 40.029000000000025,
+      "start_time": 39.62466666666669,
+      "word": "They"
+    },
+    {
+      "end_time": 40.43333333333336,
+      "start_time": 40.029000000000025,
+      "word": "even"
+    },
+    {
+      "end_time": 40.83766666666669,
+      "start_time": 40.43333333333336,
+      "word": "let"
+    },
+    {
+      "end_time": 41.242000000000026,
+      "start_time": 40.83766666666669,
+      "word": "you"
+    },
+    {
+      "end_time": 41.64633333333336,
+      "start_time": 41.242000000000026,
+      "word": "try"
+    },
+    {
+      "end_time": 42.05066666666669,
+      "start_time": 41.64633333333336,
+      "word": "it"
+    },
+    {
+      "end_time": 42.45500000000003,
+      "start_time": 42.05066666666669,
+      "word": "30"
+    },
+    {
+      "end_time": 42.85933333333336,
+      "start_time": 42.45500000000003,
+      "word": "days"
+    },
+    {
+      "end_time": 43.263666666666694,
+      "start_time": 42.85933333333336,
+      "word": "risk"
+    },
+    {
+      "end_time": 43.66800000000003,
+      "start_time": 43.263666666666694,
+      "word": "free,"
+    },
+    {
+      "end_time": 44.07233333333336,
+      "start_time": 43.66800000000003,
+      "word": "so"
+    },
+    {
+      "end_time": 44.476666666666695,
+      "start_time": 44.07233333333336,
+      "word": "get"
+    },
+    {
+      "end_time": 44.88100000000003,
+      "start_time": 44.476666666666695,
+      "word": "yours"
+    },
+    {
+      "end_time": 45.28533333333336,
+      "start_time": 44.88100000000003,
+      "word": "to"
+    },
+    {
+      "end_time": 45.689666666666696,
+      "start_time": 45.28533333333336,
+      "word": "experience"
+    },
+    {
+      "end_time": 46.09400000000003,
+      "start_time": 45.689666666666696,
+      "word": "real"
+    },
+    {
+      "end_time": 46.49833333333336,
+      "start_time": 46.09400000000003,
+      "word": "peace"
+    },
+    {
+      "end_time": 46.9026666666667,
+      "start_time": 46.49833333333336,
+      "word": "of"
+    },
+    {
+      "end_time": 47.30700000000003,
+      "start_time": 46.9026666666667,
+      "word": "mind"
+    },
+    {
+      "end_time": 47.711333333333364,
+      "start_time": 47.30700000000003,
+      "word": "on"
+    },
+    {
+      "end_time": 48.1156666666667,
+      "start_time": 47.711333333333364,
+      "word": "the"
+    },
+    {
+      "end_time": 48.52000000000003,
+      "start_time": 48.1156666666667,
+      "word": "road."
+    }
+  ],
+  "subtitle_sentences": [
+    {
+      "end_word": 7,
+      "start_word": 0,
+      "text": "﻿Do NOT buy the cheap pregnancy seatbelt adjusters.",
+      "word_count": 8
+    },
+    {
+      "end_word": 8,
+      "start_word": 8,
+      "text": "Seriously.",
+      "word_count": 1
+    },
+    {
+      "end_word": 17,
+      "start_word": 9,
+      "text": "Let me save you from making a dangerous mistake.",
+      "word_count": 9
+    },
+    {
+      "end_word": 21,
+      "start_word": 18,
+      "text": "Independent crash testing showed",
+      "word_count": 4
+    },
+    {
+      "end_word": 26,
+      "start_word": 22,
+      "text": "those budget options fail catastrophically.",
+      "word_count": 5
+    },
+    {
+      "end_word": 29,
+      "start_word": 27,
+      "text": "The clips break.",
+      "word_count": 3
+    },
+    {
+      "end_word": 32,
+      "start_word": 30,
+      "text": "The straps snap.",
+      "word_count": 3
+    },
+    {
+      "end_word": 39,
+      "start_word": 33,
+      "text": "In the moment you need protection most,",
+      "word_count": 7
+    },
+    {
+      "end_word": 42,
+      "start_word": 40,
+      "text": "you have nothing.",
+      "word_count": 3
+    },
+    {
+      "end_word": 51,
+      "start_word": 43,
+      "text": "This is exactly why Baby Gaurd Belt was created.",
+      "word_count": 9
+    },
+    {
+      "end_word": 57,
+      "start_word": 52,
+      "text": "It's not just another pregnancy gadget.",
+      "word_count": 6
+    },
+    {
+      "end_word": 63,
+      "start_word": 58,
+      "text": "It's a crash tested, certified solution",
+      "word_count": 6
+    },
+    {
+      "end_word": 70,
+      "start_word": 64,
+      "text": "that clips onto your seat and positions",
+      "word_count": 7
+    },
+    {
+      "end_word": 76,
+      "start_word": 71,
+      "text": "your seatbelt safely below your belly.",
+      "word_count": 6
+    },
+    {
+      "end_word": 81,
+      "start_word": 77,
+      "text": "Away from your vulnerable baby.",
+      "word_count": 5
+    },
+    {
+      "end_word": 85,
+      "start_word": 82,
+      "text": "Yes, this costs more.",
+      "word_count": 4
+    },
+    {
+      "end_word": 90,
+      "start_word": 86,
+      "text": "Because it's actually engineered correctly.",
+      "word_count": 5
+    },
+    {
+      "end_word": 94,
+      "start_word": 91,
+      "text": "Because it's been tested.",
+      "word_count": 4
+    },
+    {
+      "end_word": 97,
+      "start_word": 95,
+      "text": "Because it works.",
+      "word_count": 3
+    },
+    {
+      "end_word": 107,
+      "start_word": 98,
+      "text": "They even let you try it 30 days risk free,",
+      "word_count": 10
+    },
+    {
+      "end_word": 119,
+      "start_word": 108,
+      "text": "so get yours to experience real peace of mind on the road.",
+      "word_count": 12
+    }
+  ],
+  "statistics": {
+    "total_highlights": 12,
+    "total_transcript_words": 120,
+    "total_subtitle_sentences": 21
+  }
+}

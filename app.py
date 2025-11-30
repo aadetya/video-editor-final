@@ -428,15 +428,20 @@ def process_video():
             return jsonify({'error': 'Video file not found'}), 400
 
         # Build highlight assignments
+                # Build highlight assignments (respect manual word indices + occurrence)
         assignments = []
         for highlight in highlights:
             assignment = HighlightAssignment(
-                phrase=highlight.get('phrase'),
-                clip_path=highlight.get('clip_path'),
-                music_path=highlight.get('music_path'),
-                music_volume=float(highlight.get('music_volume', 1.0))
+                phrase=highlight.get("phrase"),
+                clip_path=highlight.get("clip_path"),
+                music_path=highlight.get("music_path"),
+                music_volume=float(highlight.get("music_volume", 1.0)),
+                occurrence=int(highlight.get("occurrence", 1) or 1),
+                start_word=highlight.get("start_word"),
+                end_word=highlight.get("end_word"),
             )
             assignments.append(assignment)
+
 
         # Generate output filename
         output_filename = f"output_{Path(video_path).stem}.mp4"
@@ -559,20 +564,41 @@ def process_video():
 
 @app.route('/download/<filename>')
 def download_file(filename):
-    """Download the processed video."""
-    file_path = os.path.join(app.config['OUTPUT_FOLDER'], filename)
-    if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True)
-    return jsonify({'error': 'File not found'}), 404
+    output_folder = app.config['OUTPUT_FOLDER']
+    # Only allow .mp4 files
+    if not filename.lower().endswith('.mp4'):
+        return jsonify({'error': 'File not found'}), 404
+    file_path = os.path.join(output_folder, filename)
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'File not found'}), 404
+    # Stream the file as an attachment
+    resp = send_from_directory(
+        output_folder,
+        filename,
+        as_attachment=True,
+        mimetype='video/mp4',
+    )
 
+    # Disable caching so every click always fetches the latest file
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+
+    return resp
 
 @app.route('/video/<filename>')
 def view_video(filename):
     """Serve the processed video for preview (not as download)."""
     file_path = os.path.join(app.config['OUTPUT_FOLDER'], filename)
     if os.path.exists(file_path):
-        return send_file(file_path, mimetype='video/mp4')
+        resp = send_file(file_path, mimetype='video/mp4')
+        # Disable caching so the preview ALWAYS matches the latest render
+        resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        resp.headers["Pragma"] = "no-cache"
+        resp.headers["Expires"] = "0"
+        return resp
     return jsonify({'error': 'File not found'}), 404
+
 
 
 @app.route('/list-clips')

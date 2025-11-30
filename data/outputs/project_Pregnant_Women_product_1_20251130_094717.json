@@ -1,0 +1,1107 @@
+{
+  "project_info": {
+    "created_at": "2025-11-30T09:47:17.751096",
+    "video_path": "uploads/Pregnant_Women_product_1.mp4",
+    "output_filename": "output_Pregnant_Women_product_1.mp4",
+    "output_path": "outputs/output_Pregnant_Women_product_1.mp4",
+    "aspect_ratio": "4:5"
+  },
+  "highlights": [
+    {
+      "phrase": "there's a 73% chance you're putting your baby in danger",
+      "start_word": 7,
+      "end_word": 16,
+      "clip_path": "clips/32.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "most pregnant women use their seatbelt wrong.",
+      "start_word": 32,
+      "end_word": 38,
+      "clip_path": "clips/38.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "The lap belt rides up on your belly instead of staying low on your hips.",
+      "start_word": 39,
+      "end_word": 53,
+      "clip_path": "clips/36.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "And when you brake hard or, God forbid, get in an accident,",
+      "start_word": 54,
+      "end_word": 65,
+      "clip_path": "clips/20.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "all that force goes straight into your bump. Directly onto your baby.",
+      "start_word": 66,
+      "end_word": 77,
+      "clip_path": "clips/1.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "It's a crash tested, certified solution that clips onto your seat",
+      "start_word": 93,
+      "end_word": 103,
+      "clip_path": "clips/4.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "and positions your seatbelt safely below your belly.",
+      "start_word": 104,
+      "end_word": 111,
+      "clip_path": "clips/7.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "Away from your vulnerable baby.",
+      "start_word": 112,
+      "end_word": 116,
+      "clip_path": "clips/5.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "The belt finally stayed where it should be— automatically.",
+      "start_word": 127,
+      "end_word": 135,
+      "clip_path": "clips/11.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "No more pulling it down every five minutes.",
+      "start_word": 136,
+      "end_word": 143,
+      "clip_path": "clips/12.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "No more anxiety every time I brake.",
+      "start_word": 144,
+      "end_word": 150,
+      "clip_path": "clips/26.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "so get yours to experience real peace of mind on the road.",
+      "start_word": 161,
+      "end_word": 172,
+      "clip_path": "clips/27.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    }
+  ],
+  "transcript": [
+    {
+      "end_time": 0.34265895953757225,
+      "start_time": 0,
+      "word": "﻿If"
+    },
+    {
+      "end_time": 0.6853179190751445,
+      "start_time": 0.34265895953757225,
+      "word": "you're"
+    },
+    {
+      "end_time": 1.0279768786127168,
+      "start_time": 0.6853179190751445,
+      "word": "pregnant"
+    },
+    {
+      "end_time": 1.370635838150289,
+      "start_time": 1.0279768786127168,
+      "word": "and"
+    },
+    {
+      "end_time": 1.7132947976878612,
+      "start_time": 1.370635838150289,
+      "word": "driving"
+    },
+    {
+      "end_time": 2.0559537572254336,
+      "start_time": 1.7132947976878612,
+      "word": "right"
+    },
+    {
+      "end_time": 2.398612716763006,
+      "start_time": 2.0559537572254336,
+      "word": "now,"
+    },
+    {
+      "end_time": 2.741271676300578,
+      "start_time": 2.398612716763006,
+      "word": "there's"
+    },
+    {
+      "end_time": 3.08393063583815,
+      "start_time": 2.741271676300578,
+      "word": "a"
+    },
+    {
+      "end_time": 3.4265895953757224,
+      "start_time": 3.08393063583815,
+      "word": "73%"
+    },
+    {
+      "end_time": 3.7692485549132946,
+      "start_time": 3.4265895953757224,
+      "word": "chance"
+    },
+    {
+      "end_time": 4.111907514450867,
+      "start_time": 3.7692485549132946,
+      "word": "you're"
+    },
+    {
+      "end_time": 4.454566473988439,
+      "start_time": 4.111907514450867,
+      "word": "putting"
+    },
+    {
+      "end_time": 4.797225433526012,
+      "start_time": 4.454566473988439,
+      "word": "your"
+    },
+    {
+      "end_time": 5.139884393063584,
+      "start_time": 4.797225433526012,
+      "word": "baby"
+    },
+    {
+      "end_time": 5.482543352601156,
+      "start_time": 5.139884393063584,
+      "word": "in"
+    },
+    {
+      "end_time": 5.825202312138728,
+      "start_time": 5.482543352601156,
+      "word": "danger"
+    },
+    {
+      "end_time": 6.1678612716763,
+      "start_time": 5.825202312138728,
+      "word": "and"
+    },
+    {
+      "end_time": 6.510520231213873,
+      "start_time": 6.1678612716763,
+      "word": "you"
+    },
+    {
+      "end_time": 6.853179190751445,
+      "start_time": 6.510520231213873,
+      "word": "don't"
+    },
+    {
+      "end_time": 7.195838150289017,
+      "start_time": 6.853179190751445,
+      "word": "even"
+    },
+    {
+      "end_time": 7.538497109826589,
+      "start_time": 7.195838150289017,
+      "word": "know"
+    },
+    {
+      "end_time": 7.881156069364161,
+      "start_time": 7.538497109826589,
+      "word": "it."
+    },
+    {
+      "end_time": 8.223815028901734,
+      "start_time": 7.881156069364161,
+      "word": "I"
+    },
+    {
+      "end_time": 8.566473988439308,
+      "start_time": 8.223815028901734,
+      "word": "had"
+    },
+    {
+      "end_time": 8.90913294797688,
+      "start_time": 8.566473988439308,
+      "word": "no"
+    },
+    {
+      "end_time": 9.251791907514454,
+      "start_time": 8.90913294797688,
+      "word": "idea"
+    },
+    {
+      "end_time": 9.594450867052027,
+      "start_time": 9.251791907514454,
+      "word": "until"
+    },
+    {
+      "end_time": 9.9371098265896,
+      "start_time": 9.594450867052027,
+      "word": "my"
+    },
+    {
+      "end_time": 10.279768786127173,
+      "start_time": 9.9371098265896,
+      "word": "doctor"
+    },
+    {
+      "end_time": 10.622427745664746,
+      "start_time": 10.279768786127173,
+      "word": "told"
+    },
+    {
+      "end_time": 10.965086705202319,
+      "start_time": 10.622427745664746,
+      "word": "me—"
+    },
+    {
+      "end_time": 11.307745664739892,
+      "start_time": 10.965086705202319,
+      "word": "most"
+    },
+    {
+      "end_time": 11.650404624277465,
+      "start_time": 11.307745664739892,
+      "word": "pregnant"
+    },
+    {
+      "end_time": 11.993063583815038,
+      "start_time": 11.650404624277465,
+      "word": "women"
+    },
+    {
+      "end_time": 12.335722543352611,
+      "start_time": 11.993063583815038,
+      "word": "use"
+    },
+    {
+      "end_time": 12.678381502890185,
+      "start_time": 12.335722543352611,
+      "word": "their"
+    },
+    {
+      "end_time": 13.021040462427758,
+      "start_time": 12.678381502890185,
+      "word": "seatbelt"
+    },
+    {
+      "end_time": 13.36369942196533,
+      "start_time": 13.021040462427758,
+      "word": "wrong."
+    },
+    {
+      "end_time": 13.706358381502904,
+      "start_time": 13.36369942196533,
+      "word": "The"
+    },
+    {
+      "end_time": 14.049017341040477,
+      "start_time": 13.706358381502904,
+      "word": "lap"
+    },
+    {
+      "end_time": 14.39167630057805,
+      "start_time": 14.049017341040477,
+      "word": "belt"
+    },
+    {
+      "end_time": 14.734335260115623,
+      "start_time": 14.39167630057805,
+      "word": "rides"
+    },
+    {
+      "end_time": 15.076994219653196,
+      "start_time": 14.734335260115623,
+      "word": "up"
+    },
+    {
+      "end_time": 15.41965317919077,
+      "start_time": 15.076994219653196,
+      "word": "on"
+    },
+    {
+      "end_time": 15.762312138728342,
+      "start_time": 15.41965317919077,
+      "word": "your"
+    },
+    {
+      "end_time": 16.104971098265914,
+      "start_time": 15.762312138728342,
+      "word": "belly"
+    },
+    {
+      "end_time": 16.447630057803487,
+      "start_time": 16.104971098265914,
+      "word": "instead"
+    },
+    {
+      "end_time": 16.79028901734106,
+      "start_time": 16.447630057803487,
+      "word": "of"
+    },
+    {
+      "end_time": 17.132947976878633,
+      "start_time": 16.79028901734106,
+      "word": "staying"
+    },
+    {
+      "end_time": 17.475606936416206,
+      "start_time": 17.132947976878633,
+      "word": "low"
+    },
+    {
+      "end_time": 17.81826589595378,
+      "start_time": 17.475606936416206,
+      "word": "on"
+    },
+    {
+      "end_time": 18.160924855491352,
+      "start_time": 17.81826589595378,
+      "word": "your"
+    },
+    {
+      "end_time": 18.503583815028925,
+      "start_time": 18.160924855491352,
+      "word": "hips."
+    },
+    {
+      "end_time": 18.846242774566498,
+      "start_time": 18.503583815028925,
+      "word": "And"
+    },
+    {
+      "end_time": 19.18890173410407,
+      "start_time": 18.846242774566498,
+      "word": "when"
+    },
+    {
+      "end_time": 19.531560693641644,
+      "start_time": 19.18890173410407,
+      "word": "you"
+    },
+    {
+      "end_time": 19.874219653179217,
+      "start_time": 19.531560693641644,
+      "word": "brake"
+    },
+    {
+      "end_time": 20.21687861271679,
+      "start_time": 19.874219653179217,
+      "word": "hard"
+    },
+    {
+      "end_time": 20.559537572254364,
+      "start_time": 20.21687861271679,
+      "word": "or,"
+    },
+    {
+      "end_time": 20.902196531791937,
+      "start_time": 20.559537572254364,
+      "word": "God"
+    },
+    {
+      "end_time": 21.24485549132951,
+      "start_time": 20.902196531791937,
+      "word": "forbid,"
+    },
+    {
+      "end_time": 21.587514450867083,
+      "start_time": 21.24485549132951,
+      "word": "get"
+    },
+    {
+      "end_time": 21.930173410404656,
+      "start_time": 21.587514450867083,
+      "word": "in"
+    },
+    {
+      "end_time": 22.27283236994223,
+      "start_time": 21.930173410404656,
+      "word": "an"
+    },
+    {
+      "end_time": 22.615491329479802,
+      "start_time": 22.27283236994223,
+      "word": "accident,"
+    },
+    {
+      "end_time": 22.958150289017375,
+      "start_time": 22.615491329479802,
+      "word": "all"
+    },
+    {
+      "end_time": 23.30080924855495,
+      "start_time": 22.958150289017375,
+      "word": "that"
+    },
+    {
+      "end_time": 23.64346820809252,
+      "start_time": 23.30080924855495,
+      "word": "force"
+    },
+    {
+      "end_time": 23.986127167630094,
+      "start_time": 23.64346820809252,
+      "word": "goes"
+    },
+    {
+      "end_time": 24.328786127167668,
+      "start_time": 23.986127167630094,
+      "word": "straight"
+    },
+    {
+      "end_time": 24.67144508670524,
+      "start_time": 24.328786127167668,
+      "word": "into"
+    },
+    {
+      "end_time": 25.014104046242814,
+      "start_time": 24.67144508670524,
+      "word": "your"
+    },
+    {
+      "end_time": 25.356763005780387,
+      "start_time": 25.014104046242814,
+      "word": "bump."
+    },
+    {
+      "end_time": 25.69942196531796,
+      "start_time": 25.356763005780387,
+      "word": "Directly"
+    },
+    {
+      "end_time": 26.042080924855533,
+      "start_time": 25.69942196531796,
+      "word": "onto"
+    },
+    {
+      "end_time": 26.384739884393106,
+      "start_time": 26.042080924855533,
+      "word": "your"
+    },
+    {
+      "end_time": 26.72739884393068,
+      "start_time": 26.384739884393106,
+      "word": "baby."
+    },
+    {
+      "end_time": 27.070057803468252,
+      "start_time": 26.72739884393068,
+      "word": "This"
+    },
+    {
+      "end_time": 27.412716763005825,
+      "start_time": 27.070057803468252,
+      "word": "is"
+    },
+    {
+      "end_time": 27.7553757225434,
+      "start_time": 27.412716763005825,
+      "word": "exactly"
+    },
+    {
+      "end_time": 28.09803468208097,
+      "start_time": 27.7553757225434,
+      "word": "why"
+    },
+    {
+      "end_time": 28.440693641618545,
+      "start_time": 28.09803468208097,
+      "word": "Baby"
+    },
+    {
+      "end_time": 28.783352601156118,
+      "start_time": 28.440693641618545,
+      "word": "Gaurd"
+    },
+    {
+      "end_time": 29.12601156069369,
+      "start_time": 28.783352601156118,
+      "word": "Belt"
+    },
+    {
+      "end_time": 29.468670520231264,
+      "start_time": 29.12601156069369,
+      "word": "was"
+    },
+    {
+      "end_time": 29.811329479768837,
+      "start_time": 29.468670520231264,
+      "word": "created."
+    },
+    {
+      "end_time": 30.15398843930641,
+      "start_time": 29.811329479768837,
+      "word": "It's"
+    },
+    {
+      "end_time": 30.496647398843983,
+      "start_time": 30.15398843930641,
+      "word": "not"
+    },
+    {
+      "end_time": 30.839306358381556,
+      "start_time": 30.496647398843983,
+      "word": "just"
+    },
+    {
+      "end_time": 31.18196531791913,
+      "start_time": 30.839306358381556,
+      "word": "another"
+    },
+    {
+      "end_time": 31.524624277456702,
+      "start_time": 31.18196531791913,
+      "word": "pregnancy"
+    },
+    {
+      "end_time": 31.867283236994275,
+      "start_time": 31.524624277456702,
+      "word": "gadget."
+    },
+    {
+      "end_time": 32.20994219653185,
+      "start_time": 31.867283236994275,
+      "word": "It's"
+    },
+    {
+      "end_time": 32.55260115606942,
+      "start_time": 32.20994219653185,
+      "word": "a"
+    },
+    {
+      "end_time": 32.895260115606995,
+      "start_time": 32.55260115606942,
+      "word": "crash"
+    },
+    {
+      "end_time": 33.23791907514457,
+      "start_time": 32.895260115606995,
+      "word": "tested,"
+    },
+    {
+      "end_time": 33.58057803468214,
+      "start_time": 33.23791907514457,
+      "word": "certified"
+    },
+    {
+      "end_time": 33.923236994219714,
+      "start_time": 33.58057803468214,
+      "word": "solution"
+    },
+    {
+      "end_time": 34.26589595375729,
+      "start_time": 33.923236994219714,
+      "word": "that"
+    },
+    {
+      "end_time": 34.60855491329486,
+      "start_time": 34.26589595375729,
+      "word": "clips"
+    },
+    {
+      "end_time": 34.95121387283243,
+      "start_time": 34.60855491329486,
+      "word": "onto"
+    },
+    {
+      "end_time": 35.293872832370006,
+      "start_time": 34.95121387283243,
+      "word": "your"
+    },
+    {
+      "end_time": 35.63653179190758,
+      "start_time": 35.293872832370006,
+      "word": "seat"
+    },
+    {
+      "end_time": 35.97919075144515,
+      "start_time": 35.63653179190758,
+      "word": "and"
+    },
+    {
+      "end_time": 36.321849710982725,
+      "start_time": 35.97919075144515,
+      "word": "positions"
+    },
+    {
+      "end_time": 36.6645086705203,
+      "start_time": 36.321849710982725,
+      "word": "your"
+    },
+    {
+      "end_time": 37.00716763005787,
+      "start_time": 36.6645086705203,
+      "word": "seatbelt"
+    },
+    {
+      "end_time": 37.349826589595445,
+      "start_time": 37.00716763005787,
+      "word": "safely"
+    },
+    {
+      "end_time": 37.69248554913302,
+      "start_time": 37.349826589595445,
+      "word": "below"
+    },
+    {
+      "end_time": 38.03514450867059,
+      "start_time": 37.69248554913302,
+      "word": "your"
+    },
+    {
+      "end_time": 38.377803468208164,
+      "start_time": 38.03514450867059,
+      "word": "belly."
+    },
+    {
+      "end_time": 38.72046242774574,
+      "start_time": 38.377803468208164,
+      "word": "Away"
+    },
+    {
+      "end_time": 39.06312138728331,
+      "start_time": 38.72046242774574,
+      "word": "from"
+    },
+    {
+      "end_time": 39.40578034682088,
+      "start_time": 39.06312138728331,
+      "word": "your"
+    },
+    {
+      "end_time": 39.748439306358456,
+      "start_time": 39.40578034682088,
+      "word": "vulnerable"
+    },
+    {
+      "end_time": 40.09109826589603,
+      "start_time": 39.748439306358456,
+      "word": "baby."
+    },
+    {
+      "end_time": 40.4337572254336,
+      "start_time": 40.09109826589603,
+      "word": "The"
+    },
+    {
+      "end_time": 40.776416184971175,
+      "start_time": 40.4337572254336,
+      "word": "first"
+    },
+    {
+      "end_time": 41.11907514450875,
+      "start_time": 40.776416184971175,
+      "word": "time"
+    },
+    {
+      "end_time": 41.46173410404632,
+      "start_time": 41.11907514450875,
+      "word": "I"
+    },
+    {
+      "end_time": 41.804393063583895,
+      "start_time": 41.46173410404632,
+      "word": "drove"
+    },
+    {
+      "end_time": 42.14705202312147,
+      "start_time": 41.804393063583895,
+      "word": "with"
+    },
+    {
+      "end_time": 42.48971098265904,
+      "start_time": 42.14705202312147,
+      "word": "it,"
+    },
+    {
+      "end_time": 42.832369942196614,
+      "start_time": 42.48971098265904,
+      "word": "I"
+    },
+    {
+      "end_time": 43.17502890173419,
+      "start_time": 42.832369942196614,
+      "word": "literally"
+    },
+    {
+      "end_time": 43.51768786127176,
+      "start_time": 43.17502890173419,
+      "word": "cried."
+    },
+    {
+      "end_time": 43.86034682080933,
+      "start_time": 43.51768786127176,
+      "word": "The"
+    },
+    {
+      "end_time": 44.203005780346906,
+      "start_time": 43.86034682080933,
+      "word": "belt"
+    },
+    {
+      "end_time": 44.54566473988448,
+      "start_time": 44.203005780346906,
+      "word": "finally"
+    },
+    {
+      "end_time": 44.88832369942205,
+      "start_time": 44.54566473988448,
+      "word": "stayed"
+    },
+    {
+      "end_time": 45.230982658959626,
+      "start_time": 44.88832369942205,
+      "word": "where"
+    },
+    {
+      "end_time": 45.5736416184972,
+      "start_time": 45.230982658959626,
+      "word": "it"
+    },
+    {
+      "end_time": 45.91630057803477,
+      "start_time": 45.5736416184972,
+      "word": "should"
+    },
+    {
+      "end_time": 46.258959537572345,
+      "start_time": 45.91630057803477,
+      "word": "be—"
+    },
+    {
+      "end_time": 46.60161849710992,
+      "start_time": 46.258959537572345,
+      "word": "automatically."
+    },
+    {
+      "end_time": 46.94427745664749,
+      "start_time": 46.60161849710992,
+      "word": "No"
+    },
+    {
+      "end_time": 47.286936416185064,
+      "start_time": 46.94427745664749,
+      "word": "more"
+    },
+    {
+      "end_time": 47.62959537572264,
+      "start_time": 47.286936416185064,
+      "word": "pulling"
+    },
+    {
+      "end_time": 47.97225433526021,
+      "start_time": 47.62959537572264,
+      "word": "it"
+    },
+    {
+      "end_time": 48.31491329479778,
+      "start_time": 47.97225433526021,
+      "word": "down"
+    },
+    {
+      "end_time": 48.657572254335356,
+      "start_time": 48.31491329479778,
+      "word": "every"
+    },
+    {
+      "end_time": 49.00023121387293,
+      "start_time": 48.657572254335356,
+      "word": "five"
+    },
+    {
+      "end_time": 49.3428901734105,
+      "start_time": 49.00023121387293,
+      "word": "minutes."
+    },
+    {
+      "end_time": 49.685549132948076,
+      "start_time": 49.3428901734105,
+      "word": "No"
+    },
+    {
+      "end_time": 50.02820809248565,
+      "start_time": 49.685549132948076,
+      "word": "more"
+    },
+    {
+      "end_time": 50.37086705202322,
+      "start_time": 50.02820809248565,
+      "word": "anxiety"
+    },
+    {
+      "end_time": 50.713526011560795,
+      "start_time": 50.37086705202322,
+      "word": "every"
+    },
+    {
+      "end_time": 51.05618497109837,
+      "start_time": 50.713526011560795,
+      "word": "time"
+    },
+    {
+      "end_time": 51.39884393063594,
+      "start_time": 51.05618497109837,
+      "word": "I"
+    },
+    {
+      "end_time": 51.741502890173514,
+      "start_time": 51.39884393063594,
+      "word": "brake."
+    },
+    {
+      "end_time": 52.08416184971109,
+      "start_time": 51.741502890173514,
+      "word": "They"
+    },
+    {
+      "end_time": 52.42682080924866,
+      "start_time": 52.08416184971109,
+      "word": "even"
+    },
+    {
+      "end_time": 52.76947976878623,
+      "start_time": 52.42682080924866,
+      "word": "let"
+    },
+    {
+      "end_time": 53.112138728323806,
+      "start_time": 52.76947976878623,
+      "word": "you"
+    },
+    {
+      "end_time": 53.45479768786138,
+      "start_time": 53.112138728323806,
+      "word": "try"
+    },
+    {
+      "end_time": 53.79745664739895,
+      "start_time": 53.45479768786138,
+      "word": "it"
+    },
+    {
+      "end_time": 54.140115606936526,
+      "start_time": 53.79745664739895,
+      "word": "30"
+    },
+    {
+      "end_time": 54.4827745664741,
+      "start_time": 54.140115606936526,
+      "word": "days"
+    },
+    {
+      "end_time": 54.82543352601167,
+      "start_time": 54.4827745664741,
+      "word": "risk"
+    },
+    {
+      "end_time": 55.168092485549245,
+      "start_time": 54.82543352601167,
+      "word": "free,"
+    },
+    {
+      "end_time": 55.51075144508682,
+      "start_time": 55.168092485549245,
+      "word": "so"
+    },
+    {
+      "end_time": 55.85341040462439,
+      "start_time": 55.51075144508682,
+      "word": "get"
+    },
+    {
+      "end_time": 56.196069364161964,
+      "start_time": 55.85341040462439,
+      "word": "yours"
+    },
+    {
+      "end_time": 56.53872832369954,
+      "start_time": 56.196069364161964,
+      "word": "to"
+    },
+    {
+      "end_time": 56.88138728323711,
+      "start_time": 56.53872832369954,
+      "word": "experience"
+    },
+    {
+      "end_time": 57.22404624277468,
+      "start_time": 56.88138728323711,
+      "word": "real"
+    },
+    {
+      "end_time": 57.56670520231226,
+      "start_time": 57.22404624277468,
+      "word": "peace"
+    },
+    {
+      "end_time": 57.90936416184983,
+      "start_time": 57.56670520231226,
+      "word": "of"
+    },
+    {
+      "end_time": 58.2520231213874,
+      "start_time": 57.90936416184983,
+      "word": "mind"
+    },
+    {
+      "end_time": 58.594682080924976,
+      "start_time": 58.2520231213874,
+      "word": "on"
+    },
+    {
+      "end_time": 58.93734104046255,
+      "start_time": 58.594682080924976,
+      "word": "the"
+    },
+    {
+      "end_time": 59.28000000000012,
+      "start_time": 58.93734104046255,
+      "word": "road."
+    }
+  ],
+  "subtitle_sentences": [
+    {
+      "end_word": 6,
+      "start_word": 0,
+      "text": "﻿If you're pregnant and driving right now,",
+      "word_count": 7
+    },
+    {
+      "end_word": 13,
+      "start_word": 7,
+      "text": "there's a 73% chance you're putting your",
+      "word_count": 7
+    },
+    {
+      "end_word": 22,
+      "start_word": 14,
+      "text": "baby in danger and you don't even know it.",
+      "word_count": 9
+    },
+    {
+      "end_word": 31,
+      "start_word": 23,
+      "text": "I had no idea until my doctor told me—",
+      "word_count": 9
+    },
+    {
+      "end_word": 38,
+      "start_word": 32,
+      "text": "most pregnant women use their seatbelt wrong.",
+      "word_count": 7
+    },
+    {
+      "end_word": 53,
+      "start_word": 39,
+      "text": "The lap belt rides up on your belly instead of staying low on your hips.",
+      "word_count": 15
+    },
+    {
+      "end_word": 65,
+      "start_word": 54,
+      "text": "And when you brake hard or, God forbid, get in an accident,",
+      "word_count": 12
+    },
+    {
+      "end_word": 77,
+      "start_word": 66,
+      "text": "all that force goes straight into your bump. Directly onto your baby.",
+      "word_count": 12
+    },
+    {
+      "end_word": 86,
+      "start_word": 78,
+      "text": "This is exactly why Baby Gaurd Belt was created.",
+      "word_count": 9
+    },
+    {
+      "end_word": 92,
+      "start_word": 87,
+      "text": "It's not just another pregnancy gadget.",
+      "word_count": 6
+    },
+    {
+      "end_word": 103,
+      "start_word": 93,
+      "text": "It's a crash tested, certified solution that clips onto your seat",
+      "word_count": 11
+    },
+    {
+      "end_word": 111,
+      "start_word": 104,
+      "text": "and positions your seatbelt safely below your belly.",
+      "word_count": 8
+    },
+    {
+      "end_word": 116,
+      "start_word": 112,
+      "text": "Away from your vulnerable baby.",
+      "word_count": 5
+    },
+    {
+      "end_word": 126,
+      "start_word": 117,
+      "text": "The first time I drove with it, I literally cried.",
+      "word_count": 10
+    },
+    {
+      "end_word": 135,
+      "start_word": 127,
+      "text": "The belt finally stayed where it should be— automatically.",
+      "word_count": 9
+    },
+    {
+      "end_word": 143,
+      "start_word": 136,
+      "text": "No more pulling it down every five minutes.",
+      "word_count": 8
+    },
+    {
+      "end_word": 150,
+      "start_word": 144,
+      "text": "No more anxiety every time I brake.",
+      "word_count": 7
+    },
+    {
+      "end_word": 160,
+      "start_word": 151,
+      "text": "They even let you try it 30 days risk free,",
+      "word_count": 10
+    },
+    {
+      "end_word": 172,
+      "start_word": 161,
+      "text": "so get yours to experience real peace of mind on the road.",
+      "word_count": 12
+    }
+  ],
+  "statistics": {
+    "total_highlights": 12,
+    "total_transcript_words": 173,
+    "total_subtitle_sentences": 19
+  }
+}

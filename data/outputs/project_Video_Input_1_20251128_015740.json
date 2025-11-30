@@ -1,0 +1,27 @@
+{
+  "project_info": {
+    "created_at": "2025-11-28T01:57:40.327878",
+    "video_path": "uploads/Video_Input_1.mp4",
+    "output_filename": "output_Video_Input_1.mp4",
+    "output_path": "outputs/output_Video_Input_1.mp4",
+    "aspect_ratio": "4:5"
+  },
+  "highlights": [
+    {
+      "phrase": "﻿Do NOT buy the cheap pregnancy seatbelt adjusters. Seriously. Let me save you from making a dangerous mistake. Independent crash testing showed those budget options fail catastrophically.",
+      "start_word": 0,
+      "end_word": 26,
+      "clip_path": "clips/10.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    }
+  ],
+  "transcript": [],
+  "subtitle_sentences": [],
+  "statistics": {
+    "total_highlights": 1,
+    "total_transcript_words": 0,
+    "total_subtitle_sentences": 0
+  }
+}

@@ -4,6 +4,9 @@ let transcriptData = [];
 let subtitles = []; // Subtitle boxes from line breaks in TXT file (for organization only)
 let highlights = [];
 let selectedRange = null;
+let isHighlightFileDialogOpen = false;
+let highlightFileChosen = false;
+
 
 // DOM Elements
 const mainVideoInput = document.getElementById("main-video-input");
@@ -82,6 +85,11 @@ const closeModalBtn = document.getElementById("close-modal-btn");
 let musicHighlights = [];
 let selectedMusicRange = null;
 
+// Mapping state + DOM
+let mappingData = null;
+const mappingFileInput = document.getElementById("mapping-file-input");
+const mappingFilename = document.getElementById("mapping-filename");
+
 // Event Listeners
 mainVideoInput.addEventListener("change", handleVideoSelection);
 transcriptFileInput.addEventListener("change", handleTranscriptSelection);
@@ -101,6 +109,11 @@ processBtn.addEventListener("click", processVideo);
 goBackBtn.addEventListener("click", goBackAndEdit);
 loadProjectBtn.addEventListener("click", loadProjectList);
 saveProjectBtn.addEventListener("click", saveProjectToS3);
+
+// Mapping file listener (guarded so we don't crash if HTML doesn't have it)
+if (mappingFileInput) {
+  mappingFileInput.addEventListener("change", handleMappingSelection);
+}
 
 // Note: Modal functionality removed - file picker opens directly on text selection
 
@@ -157,6 +170,218 @@ function checkUploadReady() {
   uploadBtn.disabled = !(hasVideo && hasTranscript);
 }
 
+// ================
+// Mapping handlers
+// ================
+
+function handleMappingSelection(e) {
+  const file = e.target.files[0];
+  mappingFilename.textContent = file ? file.name : "";
+
+  if (!file) {
+    mappingData = null;
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    let text = evt.target.result;
+
+    // Strip BOM if present
+    if (text && text.charCodeAt(0) === 0xfeff) {
+      text = text.slice(1);
+    }
+
+    // Normalize Unicode arrow to ASCII "->"
+    text = text.replace(/→/g, "->");
+
+    try {
+      // Try JSON first
+      const json = JSON.parse(text);
+      if (!Array.isArray(json)) {
+        throw new Error("Mapping JSON must be an array of objects.");
+      }
+      json.forEach((item) => {
+        if (
+          typeof item.segment !== "string" ||
+          (typeof item.clip !== "number" && typeof item.clip !== "string")
+        ) {
+          throw new Error(
+            "Each mapping entry must have a 'segment' (string) and 'clip' (number or string)."
+          );
+        }
+      });
+      mappingData = json;
+      console.log("Loaded mapping as JSON:", mappingData);
+    } catch (jsonErr) {
+      // Fallback: TXT mapping like `"Some sentence" -> 4`
+      try {
+        const lines = text
+          .split("\n")
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0);
+
+        const parsed = [];
+        for (const line of lines) {
+          const parts = line.split("->");
+          if (parts.length !== 2) continue;
+
+          let segment = parts[0].trim();
+          let clipPart = parts[1].trim();
+
+          // Remove surrounding quotes if present
+          if (
+            (segment.startsWith('"') && segment.endsWith('"')) ||
+            (segment.startsWith("'") && segment.endsWith("'"))
+          ) {
+            segment = segment.slice(1, -1);
+          }
+
+          // Strip trailing non-digits from clip part
+          clipPart = clipPart.replace(/[^\d]+$/g, "").trim();
+          const clipNumber = parseInt(clipPart, 10);
+          if (!segment || Number.isNaN(clipNumber)) continue;
+
+          parsed.push({ segment, clip: clipNumber });
+        }
+
+        if (!parsed.length) {
+          throw new Error("No valid mapping lines found in TXT file.");
+        }
+
+        mappingData = parsed;
+        console.log("Loaded mapping as TXT mapping:", mappingData);
+      } catch (txtErr) {
+        console.error("Failed to parse mapping:", { jsonErr, txtErr });
+        mappingData = null;
+        alert(
+          "Mapping file could not be parsed as JSON or TXT mapping. Please check the format."
+        );
+      }
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+// Helper: normalize a full segment from the mapping file
+// Uses the same token logic as normalizeWordToken so mapping and transcript align.
+function normalizeSegment(text) {
+  if (!text) return "";
+  return text
+    .replace("\ufeff", "")
+    .toLowerCase()
+    .split(/\s+/)
+    .map((token) => normalizeWordToken(token))
+    .filter(Boolean)
+    .join(" ");
+}
+
+
+// Helper: normalize a single word token from transcriptData
+function normalizeWordToken(token) {
+  if (!token) return "";
+  return token
+    .toLowerCase()
+    // strip non-alphanumerics
+    .replace(/[^a-z0-9]+/gi, "");
+}
+
+// Use mapping to auto-create highlight segments (word-level search across transcript)
+function applyAutoHighlightsFromMapping() {
+  if (!mappingData || !mappingData.length) return;
+  if (!transcriptData || !transcriptData.length) return;
+
+  // Normalize entire transcript into tokens once
+  const transcriptTokens = transcriptData.map((w) =>
+    normalizeWordToken(w.word)
+  );
+
+  let addedCount = 0;
+
+  mappingData.forEach((entry) => {
+    const rawSegment = entry.segment || "";
+    const clipSpec = entry.clip;
+
+    // Normalize mapping segment
+    const normalized = normalizeSegment(rawSegment);
+    if (!normalized) return;
+
+    const segmentTokens = normalized.split(" ").filter(Boolean);
+    const segLen = segmentTokens.length;
+    if (!segLen) return;
+
+    let startIndex = -1;
+
+    // Sliding-window match over the WHOLE transcript (not per-subtitle)
+    outer: for (let i = 0; i <= transcriptTokens.length - segLen; i++) {
+      for (let j = 0; j < segLen; j++) {
+        if (transcriptTokens[i + j] !== segmentTokens[j]) {
+          continue outer;
+        }
+      }
+      startIndex = i;
+      break;
+    }
+
+    if (startIndex === -1) {
+      console.warn(
+        "Mapping segment not found in transcript (word-level):",
+        rawSegment,
+        "(normalized:",
+        normalized,
+        ")"
+      );
+      return;
+    }
+
+    const endIndex = startIndex + segLen - 1;
+
+    // Use original words (with punctuation) for the phrase
+    const phrase = transcriptData
+      .slice(startIndex, endIndex + 1)
+      .map((w) => w.word)
+      .join(" ");
+
+    // Derive clip path from clipSpec
+    let clipPath = null;
+    if (typeof clipSpec === "number") {
+      clipPath = `clips/${clipSpec}.mp4`;
+    } else if (typeof clipSpec === "string") {
+      if (clipSpec.startsWith("clips/") || clipSpec.endsWith(".mp4")) {
+        clipPath = clipSpec;
+      } else {
+        clipPath = `clips/${clipSpec}`;
+      }
+    }
+
+    const highlight = {
+      phrase,
+      start_word: startIndex,
+      end_word: endIndex,
+      clip_path: clipPath,
+      music_path: null,
+      music_volume: 1.0,
+      occurrence: 1,
+    };
+
+    highlights.push(highlight);
+    addedCount++;
+  });
+
+  console.log(
+    `Auto-highlights added from mapping (word-level): ${addedCount}`
+  );
+  if (addedCount > 0) {
+    updateHighlightsList();
+    updatePreviewHighlights();
+  }
+}
+
+// =========================
+// Upload video + TXT
+// =========================
+
 async function uploadVideo() {
   const videoFile = mainVideoInput.files[0];
   const txtFile = transcriptFileInput.files[0];
@@ -206,6 +431,11 @@ async function uploadVideo() {
     musicSelectionSection.style.display = "block";
     musicHighlightsSection.style.display = "block";
     processSection.style.display = "block";
+
+    // If user already chose a mapping file, apply it now
+    if (mappingData && mappingData.length) {
+      applyAutoHighlightsFromMapping();
+    }
 
     alert(
       `Script loaded! Found ${data.subtitles.length} subtitle boxes from ${data.word_count} words.`
@@ -297,7 +527,7 @@ function displayTranscript(subtitles, transcript) {
       if (e.buttons === 1 && selectedRange && isDragging) {
         selectedRange.end = parseInt(wordSpan.dataset.index);
         updateSelection(false); // Don't open file picker during drag
-        
+
         // Auto-scroll to keep selected word visible
         autoScrollToElement(wordSpan, transcriptDisplay);
       }
@@ -378,7 +608,7 @@ function displayMusicTranscript(transcript) {
       if (e.buttons === 1 && selectedMusicRange && isDraggingMusic) {
         selectedMusicRange.end = parseInt(wordSpan.dataset.index);
         updateMusicSelection(false); // Don't open file picker during drag
-        
+
         // Auto-scroll to keep selected word visible
         autoScrollToElement(wordSpan, musicTranscriptDisplay);
       }
@@ -490,13 +720,12 @@ function updateSelection(showFilePicker = false) {
     .slice(start, end + 1)
     .map((e) => e.word)
     .join(" ");
-  
-  // Update selection controls text (for backward compatibility)
+
+  // Update selection controls text
   selectedTextSpan.textContent = selectedWords;
-  
-  // Directly open file picker when selection is complete
+
+  // Open file picker when selection is complete
   if (showFilePicker) {
-    // Create a temporary file input if it doesn't exist
     let tempFileInput = document.getElementById("temp-video-input");
     if (!tempFileInput) {
       tempFileInput = document.createElement("input");
@@ -505,41 +734,44 @@ function updateSelection(showFilePicker = false) {
       tempFileInput.accept = "video/*";
       tempFileInput.style.display = "none";
       document.body.appendChild(tempFileInput);
-      
-      // Handle file selection
+
+      // Handle file selection ONLY when a file is actually chosen
       tempFileInput.addEventListener("change", async (e) => {
-        const file = e.target.files[0];
+        const file =
+          e.target.files && e.target.files[0] ? e.target.files[0] : null;
         if (file && selectedRange) {
           await uploadAndAttachVideo(file);
-          // Reset the input for next selection
-          tempFileInput.value = "";
         }
+        // Reset so the same file can be picked again later
+        tempFileInput.value = "";
       });
     }
-    
+
     // Trigger file picker
     tempFileInput.click();
   }
 }
 
+
+
 function autoScrollToElement(element, container) {
   // Auto-scroll container to keep element visible when selecting
   if (!element || !container) return;
-  
+
   const containerRect = container.getBoundingClientRect();
   const elementRect = element.getBoundingClientRect();
-  
+
   // Calculate scroll boundaries
   const scrollThreshold = 80; // Start scrolling when within 80px of edge
   const scrollPadding = 30; // Keep 30px padding from edge
-  
+
   // Check if element is above visible area or near top
   if (elementRect.top < containerRect.top + scrollThreshold) {
     // Scroll element into view at the top with padding
     element.scrollIntoView({
-      behavior: 'auto', // Instant scroll during drag
-      block: 'nearest',
-      inline: 'nearest'
+      behavior: "auto", // Instant scroll during drag
+      block: "nearest",
+      inline: "nearest",
     });
     // Fine-tune scroll position
     if (container.scrollTop > 0) {
@@ -550,9 +782,9 @@ function autoScrollToElement(element, container) {
   else if (elementRect.bottom > containerRect.bottom - scrollThreshold) {
     // Scroll element into view at the bottom with padding
     element.scrollIntoView({
-      behavior: 'auto', // Instant scroll during drag
-      block: 'nearest',
-      inline: 'nearest'
+      behavior: "auto", // Instant scroll during drag
+      block: "nearest",
+      inline: "nearest",
     });
     // Fine-tune scroll position
     container.scrollTop = container.scrollTop + scrollPadding;
@@ -603,51 +835,29 @@ async function uploadAndAttachVideo(file) {
       return;
     }
 
-    // Get the clip path
+    // Get the clip path from server response
     const clipPath = uploadData.file_path;
 
-    // Add highlight with the uploaded video
-    const start = Math.min(selectedRange.start, selectedRange.end);
-    const end = Math.max(selectedRange.start, selectedRange.end);
-    const phrase = transcriptData
-      .slice(start, end + 1)
-      .map((e) => e.word)
-      .join(" ");
-
-    const highlight = {
-      phrase: phrase,
-      start_word: start,
-      end_word: end,
-      clip_path: clipPath,
-      music_path: null,
-      music_volume: 1.0,
-      occurrence: 1,
-    };
-
-    highlights.push(highlight);
-
-    // Update the existing clips dropdown
+    // Add to existing clips dropdown and select it
     const option = document.createElement("option");
     option.value = clipPath;
     option.textContent = file.name;
     existingClipsSelect.appendChild(option);
+    existingClipsSelect.value = clipPath;
 
-    // Update UI
-    updateHighlightsList();
-    updatePreviewHighlights();
-    
-    // Clear selection
-    selectedRange = null;
-    document.querySelectorAll(".word-inline.selected").forEach((el) => {
-      el.classList.remove("selected");
-    });
-    document.querySelectorAll(".preview-word.selecting").forEach((el) => {
-      el.classList.remove("selecting");
-    });
+    // Reuse the existing, battle-tested highlight creation flow
+    // This will:
+    //  - read selectedRange
+    //  - push into `highlights`
+    //  - update the "Review B-roll highlights" list
+    //  - update preview highlights
+    //  - cancel/clear the selection
+    addHighlight();
   } catch (error) {
     alert("Error uploading video: " + error.message);
   }
 }
+
 
 // Music selection functions
 function updateMusicSelection(showFilePicker = false) {
@@ -678,7 +888,7 @@ function updateMusicSelection(showFilePicker = false) {
     .join(" ");
   musicSelectedText.textContent = selectedWords;
   musicSelectionControls.style.display = "block";
-  
+
   // Directly open file picker when selection is complete
   if (showFilePicker) {
     // Create a temporary file input if it doesn't exist
@@ -690,7 +900,7 @@ function updateMusicSelection(showFilePicker = false) {
       tempMusicInput.accept = "audio/*";
       tempMusicInput.style.display = "none";
       document.body.appendChild(tempMusicInput);
-      
+
       // Handle file selection
       tempMusicInput.addEventListener("change", async (e) => {
         const file = e.target.files[0];
@@ -701,7 +911,7 @@ function updateMusicSelection(showFilePicker = false) {
         }
       });
     }
-    
+
     // Trigger file picker
     tempMusicInput.click();
   }
@@ -873,7 +1083,7 @@ async function uploadAndAttachMusic(file) {
     // Update UI
     updateMusicHighlightsList();
     updateMusicHighlightsDisplay();
-    
+
     // Clear selection
     selectedMusicRange = null;
     document.querySelectorAll(".word-inline-music.selected").forEach((el) => {
@@ -1146,7 +1356,7 @@ function saveState() {
     aspectRatio: aspectRatioSelect.value || "4:5",
     videoFilename: videoFilename.textContent,
     transcriptFilename: transcriptFilename.textContent,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
   sessionStorage.setItem("videoEditorState", JSON.stringify(state));
   console.log("State saved:", state);
@@ -1161,14 +1371,14 @@ function restoreState() {
 
   try {
     const state = JSON.parse(savedState);
-    
+
     // Restore all state variables
     currentVideoPath = state.currentVideoPath;
     transcriptData = state.transcriptData || [];
     subtitles = state.subtitles || [];
     highlights = state.highlights || [];
     musicHighlights = state.musicHighlights || [];
-    
+
     // Restore UI elements
     if (state.videoFilename) {
       videoFilename.textContent = state.videoFilename;
@@ -1179,18 +1389,18 @@ function restoreState() {
     if (state.aspectRatio) {
       aspectRatioSelect.value = state.aspectRatio;
     }
-    
+
     // Restore transcript displays
     if (transcriptData.length > 0 && subtitles.length > 0) {
       displayTranscript(subtitles, transcriptData);
       displayMusicTranscript(transcriptData);
-      
+
       // Restore highlights displays
       updateHighlightsList();
       updateMusicHighlightsList();
       updatePreviewHighlights();
       updateMusicHighlightsDisplay();
-      
+
       // Show all relevant sections
       transcriptPreviewSection.style.display = "block";
       selectionSection.style.display = "block";
@@ -1199,14 +1409,30 @@ function restoreState() {
       musicHighlightsSection.style.display = "block";
       processSection.style.display = "block";
     }
-    
+
     // Hide result section
     resultSection.style.display = "none";
-    
+
+    // Clear any existing video preview when going back to edit
+    if (videoPreview) {
+      try {
+        videoPreview.pause();
+      } catch (e) {
+        console.warn("Error pausing video preview:", e);
+      }
+      videoPreview.removeAttribute("src");
+      videoPreview.load(); // force the <video> element to reset
+    }
+    if (videoPreviewContainer) {
+      videoPreviewContainer.style.display = "none";
+    }
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" });
-    
-    alert(`State restored! You have ${highlights.length} clip highlights and ${musicHighlights.length} music highlights. You can now edit them.`);
+
+    alert(
+      `State restored! You have ${highlights.length} clip highlights and ${musicHighlights.length} music highlights. You can now edit them.`
+    );
     return true;
   } catch (error) {
     console.error("Error restoring state:", error);
@@ -1225,7 +1451,7 @@ function goBackAndEdit() {
 // Project loading functions
 async function loadProjectList() {
   loadProjectBtn.disabled = true;
-  projectList.innerHTML = '<p>Loading projects...</p>';
+  projectList.innerHTML = "<p>Loading projects...</p>";
   projectListContainer.style.display = "block";
 
   try {
@@ -1238,7 +1464,8 @@ async function loadProjectList() {
     }
 
     if (!data.projects || data.projects.length === 0) {
-      projectList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No projects found in S3.</p>';
+      projectList.innerHTML =
+        '<p style="color: #999; text-align: center; padding: 20px;">No projects found in S3.</p>';
       return;
     }
 
@@ -1261,10 +1488,14 @@ async function loadProjectList() {
           <div>
             <strong>${project.filename}</strong>
             <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
-              Modified: ${formattedDate} | Size: ${(project.size / 1024).toFixed(2)} KB
+              Modified: ${formattedDate} | Size: ${(project.size / 1024).toFixed(
+                2
+              )} KB
             </div>
           </div>
-          <button class="btn btn-primary" onclick="loadProjectFromS3('${project.key}')">
+          <button class="btn btn-primary" onclick="loadProjectFromS3('${
+            project.key
+          }')">
             Load
           </button>
         </div>
@@ -1281,7 +1512,8 @@ async function loadProjectList() {
     });
   } catch (error) {
     alert("Error loading projects: " + error.message);
-    projectList.innerHTML = '<p style="color: red;">Error loading projects.</p>';
+    projectList.innerHTML =
+      '<p style="color: red;">Error loading projects.</p>';
   } finally {
     loadProjectBtn.disabled = false;
   }
@@ -1300,12 +1532,13 @@ async function saveProjectToS3() {
 
   saveProjectBtn.disabled = true;
   saveProjectStatus.style.display = "block";
-  saveProjectStatus.innerHTML = '<p style="color: #666;">Saving project...</p>';
+  saveProjectStatus.innerHTML =
+    '<p style="color: #666;">Saving project...</p>';
 
   try {
     const projectName = projectNameInput.value.trim() || null;
     const aspectRatio = aspectRatioSelect.value || "4:5";
-    
+
     // Combine highlights and music highlights
     const allHighlights = [...highlights, ...musicHighlights];
 
@@ -1337,10 +1570,10 @@ async function saveProjectToS3() {
         Project saved as: <strong>${data.project_filename}</strong>
       </p>
     `;
-    
+
     // Clear project name input
     projectNameInput.value = "";
-    
+
     // Auto-hide success message after 5 seconds
     setTimeout(() => {
       saveProjectStatus.style.display = "none";
@@ -1360,7 +1593,7 @@ async function loadProjectFromS3(projectKey) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        project_key: projectKey
+        project_key: projectKey,
       }),
     });
 
@@ -1372,17 +1605,17 @@ async function loadProjectFromS3(projectKey) {
     }
 
     const project = data.project;
-    
+
     // Restore state from project
     currentVideoPath = project.project_info.video_path;
     transcriptData = project.transcript || [];
     subtitles = project.subtitle_sentences || [];
-    
+
     // Separate clip highlights from music highlights
     const allHighlights = project.highlights || [];
     highlights = [];
     musicHighlights = [];
-    
+
     allHighlights.forEach((highlight) => {
       if (highlight.music_path && !highlight.clip_path) {
         // This is a music-only highlight
@@ -1400,9 +1633,9 @@ async function loadProjectFromS3(projectKey) {
 
     // Restore filenames
     if (project.project_info.video_path) {
-      const videoName = project.project_info.video_path.split('/').pop();
+      const videoName = project.project_info.video_path.split("/").pop();
       videoFilename.textContent = `Selected: ${videoName}`;
-      
+
       // Note: We assume the video file still exists locally
       // If it doesn't, the user will need to re-upload it
     }
@@ -1411,13 +1644,13 @@ async function loadProjectFromS3(projectKey) {
     if (transcriptData.length > 0 && subtitles.length > 0) {
       displayTranscript(subtitles, transcriptData);
       displayMusicTranscript(transcriptData);
-      
+
       // Restore highlights displays
       updateHighlightsList();
       updateMusicHighlightsList();
       updatePreviewHighlights();
       updateMusicHighlightsDisplay();
-      
+
       // Show all relevant sections
       transcriptPreviewSection.style.display = "block";
       selectionSection.style.display = "block";
@@ -1433,7 +1666,9 @@ async function loadProjectFromS3(projectKey) {
     // Scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" });
 
-    alert(`Project loaded successfully! You have ${highlights.length} clip highlights and ${musicHighlights.length} music highlights. You can now edit them.`);
+    alert(
+      `Project loaded successfully! You have ${highlights.length} clip highlights and ${musicHighlights.length} music highlights. You can now edit them.`
+    );
   } catch (error) {
     alert("Error loading project: " + error.message);
   }
@@ -1461,7 +1696,7 @@ async function processVideo() {
 
   try {
     const aspectRatio = aspectRatioSelect.value || "4:5";
-    
+
     const response = await fetch("/process-video", {
       method: "POST",
       headers: {
@@ -1486,18 +1721,33 @@ async function processVideo() {
 
     resultMessage.textContent = data.message;
     downloadBtn.onclick = () => {
-      window.location.href = `/download/${data.output_filename}`;
+      const url = `/download/${encodeURIComponent(data.output_filename)}`;
+      window.location.href = url;
     };
+    
 
-    // Set video preview source
+    // Set video preview source (cache-busted + hard reload)
     if (data.output_filename) {
-      videoPreview.src = `/video/${data.output_filename}`;
-      videoPreviewContainer.style.display = "block";
-      // Load the video
+      const ts = Date.now();
+      const newSrc = `/video/${data.output_filename}?t=${ts}`;
+
+      // Reset the video element first to avoid weird stale states
+      try {
+        videoPreview.pause();
+      } catch (e) {
+        console.warn("Error pausing video preview:", e);
+      }
+      videoPreview.removeAttribute("src");
       videoPreview.load();
+
+      // Now set the fresh URL
+      videoPreview.src = newSrc;
+      videoPreviewContainer.style.display = "block";
+      videoPreview.load(); // actually load the new video file
     } else {
       videoPreviewContainer.style.display = "none";
     }
+    
 
     resultSection.style.display = "block";
     processProgress.style.display = "none";
@@ -1507,4 +1757,9 @@ async function processVideo() {
   } finally {
     processBtn.disabled = false;
   }
+}
+
+// Hook up volume display initially
+if (musicVolume && musicVolumeDisplay) {
+  musicVolumeDisplay.textContent = musicVolume.value;
 }

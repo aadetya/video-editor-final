@@ -2,6 +2,7 @@
 FROM nvidia/cuda:13.0.1-cudnn-runtime-ubuntu22.04
 
 # Set environment variables
+ENV TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -31,7 +32,7 @@ RUN python3 -m pip install --upgrade pip
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Create necessary directories
 RUN mkdir -p /app/audio_files \
@@ -50,6 +51,10 @@ COPY video_overlay_script.py .
 COPY fonts/ ./fonts/
 COPY static/ ./static/
 COPY templates/ ./templates/
+
+# Copy default clips and audio (so RunPod has them too)
+COPY data/clips/ ./clips/
+COPY data/audio_files/ ./audio_files/
 
 # Expose port for Flask app
 EXPOSE 5000

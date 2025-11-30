@@ -28,7 +28,7 @@ services:
     image: video-editor:latest
 
     ports:
-      - "5000:5000"
+      - "5001:5000"
 
     volumes:
       # Persistent data directories
@@ -62,13 +62,13 @@ services:
       - REDIS_CACHE_TTL=${REDIS_CACHE_TTL:-86400}
 
     # GPU support - requires nvidia-docker2
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    #deploy:
+    #  resources:
+    #    reservations:
+    #      devices:
+    #        - driver: nvidia
+    #          count: all
+    #          capabilities: [gpu]
 
     restart: unless-stopped
 

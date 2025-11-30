@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from difflib import SequenceMatcher
 from typing import Dict, List, Optional, Sequence, Tuple
 
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -32,10 +33,17 @@ except ImportError:
 
 try:
     import whisper
-
     HAVE_WHISPER = True
 except ImportError:
     HAVE_WHISPER = False
+
+try:
+    import torch
+    import whisperx
+
+    HAVE_WHISPERX = True
+except ImportError:
+    HAVE_WHISPERX = False
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -44,7 +52,10 @@ try:
 except ImportError:
     HAVE_PIL = False
 
+
+
 PIL_FONT_CACHE: Dict[Tuple[str, int], "ImageFont.FreeTypeFont"] = {}
+
 
 
 # --------------------------------------------------------------------------- #
@@ -380,6 +391,151 @@ def transcribe_audio_whisper(
             )
     return transcript
 
+def transcribe_audio_whisperx(
+    audio_path: str,
+    model_size: str = "base",
+) -> List[Dict[str, float]]:
+    """
+    Transcribe + ALIGN using WhisperX for more accurate, waveform-based word timings.
+    Returns the same transcript format as transcribe_audio_whisper:
+        [{"word": "...", "start_time": float, "end_time": float}, ...]
+    """
+
+    if not HAVE_WHISPERX:
+        raise ImportError(
+            "WhisperX is not installed. Please install whisperx + torch to use waveform alignment."
+        )
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # IMPORTANT:
+    # - On GPU we can use float16 (fast).
+    # - On CPU we can only use int8 or float32 instead.
+    compute_type = "float16" if device == "cuda" else "int8"
+    logger.info(
+        f"  [TRANSCRIPT] Using WhisperX on {device} (model: {model_size}) for waveform-aligned transcript..."
+    )
+
+    # 1) Load audio
+    audio = whisperx.load_audio(audio_path)
+
+    # 2) Run WhisperX transcription (segment-level)
+    model = whisperx.load_model(model_size, device=device,compute_type=compute_type)
+    # You can tune batch_size if needed
+    result = model.transcribe(audio, batch_size=16)
+
+    # Save raw text for debugging (reuses your helper)
+    if "text" in result:
+        save_the_transcribe_text(result["text"], audio_path)
+
+    # 3) Load alignment model for the detected language
+    lang = result.get("language", "en")
+    logger.info(f"  [TRANSCRIPT] WhisperX detected language: {lang}")
+    align_model, metadata = whisperx.load_align_model(
+        language_code=lang, device=device
+    )
+
+    # 4) Run alignment to get precise word timings
+    aligned_result = whisperx.align(
+        result["segments"], align_model, metadata, audio, device
+    )
+
+    word_segments = aligned_result.get("word_segments", [])
+    transcript: List[Dict[str, float]] = []
+
+    for w in word_segments:
+        # WhisperX usually uses "word"; older versions may use "text"
+        token = (w.get("word") or w.get("text") or "").strip()
+        if not token:
+            continue
+        start = float(w["start"])
+        end = float(w["end"])
+        transcript.append(
+            {
+                "word": token,
+                "start_time": start,
+                "end_time": end,
+            }
+        )
+
+    logger.info(
+        f"  [TRANSCRIPT] WhisperX produced {len(transcript)} waveform-aligned words."
+    )
+    return transcript
+
+def build_transcript(
+    video_path: str,
+    transcript_text: Optional[str],
+    whisper_model: str,
+) -> List[Dict[str, float]]:
+    """
+    Create a per-word transcript, preferring waveform-aligned WhisperX if available,
+    and falling back to standard Whisper word timestamps otherwise.
+
+    Returns:
+        List[{"word": str, "start_time": float, "end_time": float}, ...]
+    """
+
+    # 1) Prefer WhisperX if installed
+    if HAVE_WHISPERX:
+        try:
+            logger.info(
+                f"  [TRANSCRIPT] Trying WhisperX waveform-aligned transcript (model: {whisper_model})..."
+            )
+            start_time = time.time()
+            transcript = transcribe_audio_whisperx(video_path, whisper_model)
+            duration = time.time() - start_time
+
+            if transcript:
+                # Save aligned transcript to JSON, same as before
+                write_subtitle_into_file(video_path, transcript)
+                logger.info(
+                    f"  [TRANSCRIPT] ✓ WhisperX transcript completed in {duration:.2f}s ({duration/60:.2f} min)"
+                )
+                logger.info(
+                    f"  [TRANSCRIPT] Generated {len(transcript)} waveform-aligned words"
+                )
+                return transcript
+            else:
+                logger.warning(
+                    "  [TRANSCRIPT] WhisperX returned an empty transcript; falling back to Whisper."
+                )
+        except Exception as exc:
+            logger.error(
+                f"  [TRANSCRIPT] ✗ WhisperX alignment failed: {exc}. Falling back to Whisper."
+            )
+
+    # 2) Fallback: standard Whisper (your old behaviour)
+    try:
+        logger.info(
+            f"  [TRANSCRIPT] Transcribing with Whisper (model: {whisper_model})..."
+        )
+        whisper_start = time.time()
+        transcript = transcribe_audio_whisper(video_path, whisper_model)
+        whisper_duration = time.time() - whisper_start
+
+        if transcript:
+            write_subtitle_into_file(video_path, transcript)
+            logger.info(
+                f"  [TRANSCRIPT] ✓ Whisper transcription completed in {whisper_duration:.2f}s ({whisper_duration/60:.2f} min)"
+            )
+            logger.info(
+                f"  [TRANSCRIPT] Generated {len(transcript)} words (non-aligned Whisper)"
+            )
+            return transcript
+        else:
+            logger.error(
+                "  [TRANSCRIPT] ✗ Whisper returned an empty transcript; cannot proceed."
+            )
+            raise RuntimeError("Whisper returned an empty transcript; cannot proceed.")
+    except Exception as exc:
+        logger.error(f"  [TRANSCRIPT] ✗ Whisper transcription failed: {exc}")
+        raise RuntimeError(
+            "Both WhisperX (if available) and Whisper transcription failed. "
+            "Ensure the models are installed and the video audio is accessible."
+        ) from exc
+
+
+
 
 def write_subtitle_into_file(
     input_file_name: str, transcript: List[Dict[str, float]]
@@ -393,31 +549,6 @@ def write_subtitle_into_file(
     print(f"Saved the video file transcription in {file_name}")
 
 
-def build_transcript(
-    video_path: str,
-    transcript_text: Optional[str],
-    whisper_model: str,
-) -> List[Dict[str, float]]:
-    """Create a per-word transcript using Whisper timestamps only."""
-
-    try:
-        logger.info(f"  [TRANSCRIPT] Transcribing with Whisper (model: {whisper_model})...")
-        whisper_start = time.time()
-        transcript = transcribe_audio_whisper(video_path, whisper_model)
-        whisper_duration = time.time() - whisper_start
-        if transcript:
-            write_subtitle_into_file(video_path, transcript)
-            logger.info(f"  [TRANSCRIPT] ✓ Whisper transcription completed in {whisper_duration:.2f}s ({whisper_duration/60:.2f} min)")
-            logger.info(f"  [TRANSCRIPT] Generated {len(transcript)} words")
-            return transcript
-    except Exception as exc:  # noqa: BLE001 - Whisper issues should surface as warnings
-        logger.error(f"  [TRANSCRIPT] ✗ Whisper transcription failed: {exc}")
-        raise RuntimeError(
-            "Whisper transcription failed. Ensure openai-whisper is installed and the model is available."
-        ) from exc
-
-    logger.error("  [TRANSCRIPT] ✗ Whisper returned an empty transcript")
-    raise RuntimeError("Whisper returned an empty transcript; cannot proceed.")
 
 
 # --------------------------------------------------------------------------- #
@@ -453,10 +584,16 @@ def _find_fuzzy_phrase_match(
     occurrence: int,
     start_index: int,
     max_window_delta: int = 2,
-    min_similarity: float = 0.75,
+    min_similarity: float = 0.80,
 ) -> Optional[Tuple[int, int]]:
-    """Find an approximate match allowing small spelling/word-count deviations."""
+    """Find an approximate match allowing small spelling/word-count deviations.
 
+    When multiple fuzzy matches are possible, we prefer:
+      1. Highest similarity ratio
+      2. Then earliest start index
+    so that occurrence=1 gives you the best match, not just the first one
+    in time.
+    """
     token_list = list(tokens)
     if not token_list or start_index >= len(transcript_words):
         return None
@@ -464,27 +601,42 @@ def _find_fuzzy_phrase_match(
     min_window = max(1, len(token_list) - max_window_delta)
     max_window = max(min_window, len(token_list) + max_window_delta)
     phrase_str = " ".join(token_list)
+
     matches: List[Tuple[int, int, float]] = []
 
     for idx in range(start_index, len(transcript_words) - min_window + 1):
+        # First word must still match to keep things sane
+        if transcript_words[idx] != token_list[0]:
+            continue
+
         remaining = len(transcript_words) - idx
         window_max = min(max_window, remaining)
+
         best_ratio = 0.0
         best_end: Optional[int] = None
+
         for window_len in range(min_window, window_max + 1):
             window_tokens = transcript_words[idx : idx + window_len]
             ratio = SequenceMatcher(None, phrase_str, " ".join(window_tokens)).ratio()
             if ratio > best_ratio:
                 best_ratio = ratio
                 best_end = idx + window_len - 1
+
         if best_end is not None and best_ratio >= min_similarity:
             matches.append((idx, best_end, best_ratio))
 
-    if len(matches) < occurrence:
+    if not matches:
         return None
+
+    if occurrence > len(matches):
+        return None
+
+    # Sort: highest similarity first, then earliest index
+    matches.sort(key=lambda item: (-item[2], item[0]))
 
     start, end, _ratio = matches[occurrence - 1]
     return start, end
+
 
 
 def find_phrase_indices(
@@ -493,7 +645,7 @@ def find_phrase_indices(
     occurrence: int = 1,
     start_index: int = 0,
 ) -> Tuple[int, int]:
-    """Locate ``phrase`` within ``transcript_words`` returning (start, end) indices.
+    """Locate phrase within transcript_words returning (start, end) indices.
 
     When an exact match cannot be found, a fuzzy search is attempted that tolerates
     small spelling differences (e.g. "infirmary" vs "infermary") or short missing
@@ -532,32 +684,140 @@ def map_assignments_to_segments(
     transcript: List[Dict[str, float]],
     assignments: Sequence[HighlightAssignment],
 ) -> List[Dict[str, Optional[object]]]:
-    """Convert user highlight selections into rendering segments."""
+    """Convert user highlight selections into rendering segments.
 
-    if not transcript:
+    This version is phrase-driven whenever a phrase is provided:
+    - We always remap (start_word, end_word) from the phrase text in the transcript,
+      ignoring any pre-filled indices for that assignment.
+    - We then tighten the span so that it starts on the first token of the phrase
+      and ends on the last token of the phrase.
+    """
+
+    if not transcript or not assignments:
         return []
 
     normalised_transcript = [normalise_word(entry["word"]) for entry in transcript]
     mapped: List[Dict[str, Optional[object]]] = []
 
+    # Enforce monotonic mapping: every subsequent phrase is searched *after*
+    # the end of the previous one.
+    search_start = 0
+
     for assignment in assignments:
+        phrase_text = (assignment.phrase or "").strip()
         start_word = assignment.start_word
         end_word = assignment.end_word
 
-        if start_word is None or end_word is None:
-            start_word, end_word = find_phrase_indices(
-                normalised_transcript,
-                assignment.phrase or "",
-                occurrence=assignment.occurrence,
-            )
+        if phrase_text:
+            # Always derive indices from the phrase when available,
+            # so the clip is anchored to the actual phrase text in the audio.
+            try:
+                start_word, end_word = find_phrase_indices(
+                    normalised_transcript,
+                    phrase_text,
+                    occurrence=assignment.occurrence,
+                    start_index=search_start,
+                )
+            except ValueError:
+                # Fallback: try full transcript so we fail less catastrophically.
+                start_word, end_word = find_phrase_indices(
+                    normalised_transcript,
+                    phrase_text,
+                    occurrence=assignment.occurrence,
+                    start_index=0,
+                )
         else:
+            # No phrase text: we require explicit indices.
+            if start_word is None or end_word is None:
+                raise ValueError(
+                    "HighlightAssignment without phrase must include "
+                    "explicit start_word/end_word indices."
+                )
             start_word = int(start_word)
             end_word = int(end_word)
 
-        if start_word < 0 or end_word >= len(transcript) or start_word > end_word:
+        start_word = int(start_word)
+        end_word = int(end_word)
+
+        if (
+            start_word < 0
+            or end_word >= len(transcript)
+            or start_word > end_word
+        ):
             raise ValueError(
-                f"Invalid word indices resolved for assignment {assignment}"
+                f"Invalid word indices resolved for assignment {assignment}: "
+                f"({start_word}, {end_word})"
             )
+
+        # If we have phrase text, tighten the span so it *exactly* covers the phrase.
+        if phrase_text:
+            phrase_tokens = [
+                normalise_word(tok) for tok in phrase_text.split()
+                if normalise_word(tok)
+            ]
+
+            if phrase_tokens:
+                first_token = phrase_tokens[0]
+                last_token = phrase_tokens[-1]
+
+                segment_tokens = normalised_transcript[start_word : end_word + 1]
+
+                # Move start_word FORWARD to the first occurrence of the first token,
+                # if it exists inside the current segment. This prevents leading
+                # words like "correctly." from being included when the phrase is
+                # "Because it's been tested.".
+                try:
+                    offset = segment_tokens.index(first_token)
+                except ValueError:
+                    offset = None
+
+                if offset is not None:
+                    new_start = start_word + offset
+                    if new_start <= end_word:
+                        start_word = new_start
+
+                # Ensure the mapped span includes the LAST token of the phrase.
+                segment_tokens = normalised_transcript[start_word : end_word + 1]
+                if last_token not in segment_tokens:
+                    for j in range(end_word + 1, len(normalised_transcript)):
+                        if normalised_transcript[j] == last_token:
+                            end_word = j
+                            break
+
+                    segment_tokens = normalised_transcript[start_word : end_word + 1]
+                    if last_token not in segment_tokens:
+                        logger.warning(
+                            "Phrase %r not fully matched in transcript "
+                            "(last token %r missing between words %d and %d).",
+                            phrase_text,
+                            last_token,
+                            start_word,
+                            end_word,
+                        )
+
+        # Final safety clamp
+        if start_word < 0:
+            start_word = 0
+        if end_word >= len(transcript):
+            end_word = len(transcript) - 1
+        if end_word < start_word:
+            end_word = start_word
+
+        snippet_words = " ".join(
+            entry["word"] for entry in transcript[start_word : end_word + 1]
+        )
+        start_time = transcript[start_word]["start_time"]
+        end_time = transcript[end_word]["end_time"]
+        logger.info(
+            "[MAP] clip=%s phrase=%r -> words[%d:%d] (%.3fs-%.3fs): %s",
+            getattr(assignment, "clip_path", None),
+            phrase_text,
+            start_word,
+            end_word,
+            start_time,
+            end_time,
+            snippet_words,
+        )
 
         mapped.append(
             {
@@ -568,6 +828,9 @@ def map_assignments_to_segments(
                 "music_volume": float(assignment.music_volume),
             }
         )
+
+        # Move the search window forward so later phrases can’t snap backwards
+        search_start = max(search_start, end_word + 1)
 
     return mapped
 
@@ -1323,7 +1586,7 @@ def process_video_with_overlays(
 ) -> None:
     """Stream through the video, overlay clips, and draw subtitles."""
     step_start = time.time()
-    
+
     logger.info("  [VIDEO PROCESSING] Opening video file...")
     cap = cv2.VideoCapture(main_video_path)
 
@@ -1340,90 +1603,131 @@ def process_video_with_overlays(
     width, height = compute_cropped_dimensions(
         source_width, source_height, target_aspect_ratio
     )
-    
-    logger.info(f"  [VIDEO PROCESSING] Video info: {source_width}x{source_height} @ {fps:.2f}fps, {video_duration:.2f}s duration")
-    logger.info(f"  [VIDEO PROCESSING] Target size: {width}x{height} (aspect ratio: {aspect_ratio})")
-    logger.info(f"  [VIDEO PROCESSING] Total frames to process: {total_frames}")
+
+    logger.info(
+        f"  [VIDEO PROCESSING] Video info: {source_width}x{source_height} @ {fps:.2f}fps, {video_duration:.2f}s duration"
+    )
+    logger.info(
+        f"  [VIDEO PROCESSING] Target size: {width}x{height} (aspect ratio: {aspect_ratio})"
+    )
+    logger.info(
+        f"  [VIDEO PROCESSING] Total frames to process: {total_frames}"
+    )
 
     segment_clip_paths: List[Optional[str]] = []
     clip_state: Dict[str, Dict[str, object]] = {}
-    
-    # First pass: Calculate segment durations and prepare slowed-down clips if needed
-    processed_clips: Dict[str, str] = {}  # Maps original clip path to processed (slowed) clip path
-    temp_files: List[str] = []  # Track temp files for cleanup
-    
-    # Calculate segment durations first
+
+    # First pass: Calculate segment durations (kept for possible future use / logging)
+    processed_clips: Dict[str, str] = {}  # original clip path -> processed clip path
+    temp_files: List[str] = []  # Track temp files for cleanup (will stay empty now)
+
     segment_durations: Dict[int, float] = {}
     for idx, segment in enumerate(highlight_segments):
         start_word = int(segment["start_word"])
         end_word = int(segment["end_word"])
         start_time = transcript[start_word]["start_time"]
         end_time = transcript[end_word]["end_time"]
-        segment_durations[idx] = end_time - start_time
-    
+        segment_durations[idx] = max(0.0, end_time - start_time)
+
+    # Compute, per clip, the longest segment duration it needs to cover
+    clip_target_durations: Dict[str, float] = {}
+    for idx, segment in enumerate(highlight_segments):
+        clip_path = segment.get("clip_path")
+        if not clip_path:
+            continue
+        seg_dur = segment_durations.get(idx, 0.0)
+        if seg_dur <= 0:
+            continue
+        prev = clip_target_durations.get(clip_path)
+        if prev is None or seg_dur > prev:
+            clip_target_durations[clip_path] = seg_dur
+
+    # Second pass: associate each highlight with a clip path and prepare capture state.
+    # Slow down any clip that is shorter than the longest segment that uses it.
     for idx, segment in enumerate(highlight_segments):
         clip_path = segment.get("clip_path")
         if not clip_path:
             segment_clip_paths.append(None)
             continue
-        
-        # Get segment duration
-        segment_duration = segment_durations.get(idx, 0)
-        
-        # Process clip if needed (slow down if shorter than segment)
+
+        if not os.path.exists(clip_path):
+            raise FileNotFoundError(f"Overlay clip not found: {clip_path}")
+
         if clip_path not in processed_clips:
-            if not os.path.exists(clip_path):
-                raise FileNotFoundError(f"Overlay clip not found: {clip_path}")
-            
-            # Get clip duration using ffprobe
-            try:
-                result = subprocess.run(
-                    [
-                        "ffprobe", "-v", "error", "-show_entries",
-                        "format=duration", "-of", "default=noprint_wrappers=1:nokey=1",
-                        clip_path
-                    ],
-                    capture_output=True,
-                    text=True,
-                    check=True
+            target_duration = clip_target_durations.get(clip_path, 0.0)
+
+            # If we don't have a positive target duration, just reuse the clip as-is.
+            if target_duration <= 0.0:
+                logger.info(
+                    f"  [CLIP] {clip_path}: target_duration={target_duration:.3f}s (<= 0) -> using clip as-is (no slowdown)."
                 )
-                clip_duration = float(result.stdout.strip())
-            except Exception:
-                # Fallback: use cv2 to get duration
-                temp_cap = cv2.VideoCapture(clip_path)
-                if temp_cap.isOpened():
-                    clip_fps = temp_cap.get(cv2.CAP_PROP_FPS) or fps
-                    clip_frames = int(temp_cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
-                    clip_duration = clip_frames / clip_fps if clip_fps > 0 else segment_duration
-                    temp_cap.release()
-                else:
-                    clip_duration = segment_duration
-            
-            # If clip is shorter than segment, slow it down
-            if clip_duration < segment_duration and segment_duration > 0:
-                speed_factor = clip_duration / segment_duration
-                # Create a temporary slowed-down version
-                temp_dir = os.path.dirname(output_path) or "."
-                base_name = os.path.splitext(os.path.basename(clip_path))[0]
-                slowed_clip_path = os.path.join(temp_dir, f"{base_name}_slowed_{idx}.mp4")
-                slow_down_video(clip_path, slowed_clip_path, speed_factor)
-                processed_clips[clip_path] = slowed_clip_path
-                temp_files.append(slowed_clip_path)
-                logger.info(f"  [CLIP PROCESSING] Slowed down clip {os.path.basename(clip_path)} ({clip_duration:.2f}s) to match segment duration ({segment_duration:.2f}s)")
-            else:
                 processed_clips[clip_path] = clip_path
-        
-        # Use the processed (possibly slowed) clip path
+            else:
+                # Measure original clip duration with OpenCV
+                tmp_cap = cv2.VideoCapture(clip_path)
+                clip_fps = tmp_cap.get(cv2.CAP_PROP_FPS) or fps
+                clip_frame_count = tmp_cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0
+                tmp_cap.release()
+
+                if clip_fps <= 0 or clip_frame_count <= 0:
+                    logger.info(
+                        f"  [CLIP] {clip_path}: unable to measure duration "
+                        f"(fps={clip_fps}, frames={clip_frame_count}) -> using clip as-is."
+                    )
+                    processed_clips[clip_path] = clip_path
+                else:
+                    clip_duration = float(clip_frame_count) / float(clip_fps)
+
+                    # We want the clip to be at least as long as the longest
+                    # segment that uses it, plus a tiny safety margin (~1 frame).
+                    required_duration = target_duration + (1.0 / fps)
+
+                    if clip_duration >= required_duration:
+                        # Clip is already long enough; no slowdown necessary.
+                        logger.info(
+                            f"  [CLIP] {clip_path}: orig_dur={clip_duration:.3f}s, "
+                            f"target_dur={target_duration:.3f}s, "
+                            f"required={required_duration:.3f}s -> no slowdown."
+                        )
+                        processed_clips[clip_path] = clip_path
+                    else:
+                        # Slow down so that output duration ~= required_duration
+                        speed_factor = clip_duration / required_duration
+                        logger.info(
+                            f"  [CLIP] {clip_path}: orig_dur={clip_duration:.3f}s, "
+                            f"target_dur={target_duration:.3f}s, "
+                            f"required={required_duration:.3f}s -> "
+                            f"slowing down (speed_factor={speed_factor:.4f})."
+                        )
+
+                        tmp_file = tempfile.NamedTemporaryFile(
+                            delete=False, suffix=".mp4"
+                        )
+                        tmp_path = tmp_file.name
+                        tmp_file.close()
+
+                        # slow_down_video uses ffmpeg with setpts based on speed_factor
+                        slow_down_video(clip_path, tmp_path, speed_factor)
+                        processed_clips[clip_path] = tmp_path
+                        temp_files.append(tmp_path)
+
+
+
         processed_clip_path = processed_clips[clip_path]
         segment_clip_paths.append(processed_clip_path)
-        
+
+        # Create and cache VideoCapture + metadata once per unique processed clip path.
         if processed_clip_path in clip_state:
             continue
-            
+
         overlay_capture = cv2.VideoCapture(processed_clip_path)
         if not overlay_capture.isOpened():
-            raise IOError(f"Cannot open overlay clip: {processed_clip_path}")
-        clip_total_frames = int(overlay_capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+            raise IOError(
+                f"Cannot open overlay clip: {processed_clip_path}"
+            )
+        clip_total_frames = int(
+            overlay_capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0
+        )
         clip_state[processed_clip_path] = {
             "capture": overlay_capture,
             "total_frames": clip_total_frames,
@@ -1448,16 +1752,50 @@ def process_video_with_overlays(
     if not writer.isOpened():
         raise IOError(f"Cannot create output file: {output_path}")
 
+    # Build highlight frame ranges and map to subtitles (if any)
     highlight_frame_ranges: List[List[int]] = []
     highlight_subtitle_indices: List[Optional[int]] = []
+
     for idx, segment in enumerate(highlight_segments):
         start_word = int(segment["start_word"])
         end_word = int(segment["end_word"])
         start_time = transcript[start_word]["start_time"]
         end_time = transcript[end_word]["end_time"]
-        start_frame = int(start_time * fps)
-        end_frame = int(end_time * fps)
+
+        # Compute a slightly extended end time so the overlay comfortably
+        # covers the last word, without bleeding into the next spoken word.
+        phrase_end_time = transcript[end_word]["end_time"]
+
+        # Small global tail margin in seconds (tweakable)
+        tail_margin = 0.12  # try 0.12; bump more if required
+
+        # Start by adding the tail margin
+        extended_end_time = phrase_end_time + tail_margin
+
+        # If there is a next word, do not extend past its start minus
+        # one frame, so we never cover the next word.
+        if end_word + 1 < len(transcript):
+            next_start_time = transcript[end_word + 1]["start_time"]
+            guard = 1.0 / fps  # leave at least one frame for the next word
+            max_safe_end_time = max(
+                phrase_end_time,  # never earlier than the phrase end
+                min(extended_end_time, next_start_time - guard),
+            )
+        else:
+            max_safe_end_time = extended_end_time
+
+        # Convert to frames
+        #   start_frame: floor so we never start late
+        #   end_frame:   ceil - 1 so we fully cover up to max_safe_end_time
+        start_frame = int(math.floor(start_time * fps))
+        end_frame = int(math.ceil(max_safe_end_time * fps)) - 1
+        if end_frame < start_frame:
+            end_frame = start_frame
+
         highlight_frame_ranges.append([start_frame, end_frame, idx])
+
+
+        # Track which subtitle block this phrase sits in (for subtitles logic)
         subtitle_index: Optional[int] = None
         if subtitle_segments:
             for sub_idx, (sub_start, sub_end) in enumerate(subtitle_segments):
@@ -1467,60 +1805,136 @@ def process_video_with_overlays(
                     break
                 subtitle_index = sub_idx
                 break
+
         highlight_subtitle_indices.append(subtitle_index)
-        if subtitle_index is not None and subtitle_segments:
-            sub_start, sub_end = subtitle_segments[subtitle_index]
-            subtitle_end_time = transcript[sub_end]["end_time"]
-            subtitle_end_frame = int(math.ceil(subtitle_end_time * fps))
-            if subtitle_end_frame > highlight_frame_ranges[-1][1]:
-                highlight_frame_ranges[-1][1] = subtitle_end_frame
-            next_subtitle_index = subtitle_index + 1
-            if 0 <= next_subtitle_index < len(subtitle_segments):
-                next_sub_start, _ = subtitle_segments[next_subtitle_index]
-                next_start_time = transcript[next_sub_start]["start_time"]
-                next_start_frame = int(math.floor(next_start_time * fps))
-                candidate_end = max(
-                    highlight_frame_ranges[-1][0], next_start_frame - 1
-                )
-                if candidate_end > highlight_frame_ranges[-1][1]:
-                    highlight_frame_ranges[-1][1] = candidate_end
 
-    for idx in range(1, len(highlight_frame_ranges)):
-        prev_range = highlight_frame_ranges[idx - 1]
-        curr_range = highlight_frame_ranges[idx]
-        prev_idx = prev_range[2]
-        curr_idx = curr_range[2]
-        prev_clip = segment_clip_paths[prev_idx]
-        curr_clip = segment_clip_paths[curr_idx]
-        consecutive_subtitles = False
-        if subtitle_segments:
-            prev_sub_idx = highlight_subtitle_indices[prev_idx]
-            curr_sub_idx = highlight_subtitle_indices[curr_idx]
-            consecutive_subtitles = (
-                prev_sub_idx is not None
-                and curr_sub_idx is not None
-                and curr_sub_idx == prev_sub_idx + 1
-            )
-        else:
-            consecutive_subtitles = curr_range[0] <= prev_range[1] + 1
+    # ─────────────────────────────────────────────────────────────────────────
+    # Enforce time ordering & non-overlap between highlight ranges
+    # This prevents a later overlay from grabbing frames
+    # that still belong to the previous phrase.
+    # ─────────────────────────────────────────────────────────────────────────
+    highlight_frame_ranges.sort(key=lambda r: r[0])
 
-        if prev_clip and curr_clip and prev_clip == curr_clip and consecutive_subtitles:
-            curr_start = curr_range[0]
-            prev_start = prev_range[0]
-            prev_end = prev_range[1]
+    for i in range(1, len(highlight_frame_ranges)):
+        prev = highlight_frame_ranges[i - 1]
+        curr = highlight_frame_ranges[i]
+        prev_start, prev_end, _ = prev
+        curr_start, curr_end, _ = curr
 
-            if curr_start > prev_end + 1:
-                prev_range[1] = curr_start - 1
+        if curr_start <= prev_end:
+            # Push the start of this range to *after* the previous one ends
+            new_start = prev_end + 1
+            if new_start > curr_end:
+                # Degenerate case: squash to a single frame if needed
+                new_start = curr_end
+            curr[0] = new_start
+    # ─────────────────────────────────────────────────────────────────────────
+    # Close small gaps between consecutive overlays so the main video does not
+    # flash briefly between them.
+    #
+    # If the gap between [prev_end] and [next_start] is <= max_gap_seconds,
+    # we extend the PREVIOUS overlay to cover up to next_start - 1.
+    # ─────────────────────────────────────────────────────────────────────────
+    max_gap_seconds = 0.75  # tunable: up to ~0.75s of gap gets "bridged"
+    max_gap_frames = max(1, int(round(max_gap_seconds * fps)))
+
+    for i in range(1, len(highlight_frame_ranges)):
+        prev = highlight_frame_ranges[i - 1]
+        curr = highlight_frame_ranges[i]
+        prev_end = prev[1]
+        curr_start = curr[0]
+
+        gap = curr_start - prev_end - 1  # frames strictly between prev_end and curr_start
+        if gap > 0 and gap <= max_gap_frames:
+            # Extend previous overlay to fill the gap
+            prev[1] = curr_start - 1
+    # ─────────────────────────────────────────────────────────────────────────
+    # If the last overlay ends just a short time before the end of the video,
+    # extend it all the way to the final frame so the video ends on the overlay
+    # instead of flashing back to the main video.
+    # ─────────────────────────────────────────────────────────────────────────
+    if highlight_frame_ranges:
+        last_frame_index = total_frames - 1
+        last_start, last_end, last_seg_idx = highlight_frame_ranges[-1]
+
+        # How much "tail" (in frames) is left after the last overlay?
+        tail_gap = last_frame_index - last_end
+
+        # Only extend if the leftover tail is small (e.g. <= 0.75s)
+        max_tail_to_video_seconds = 0.75
+        max_tail_to_video_frames = max(
+            1, int(round(max_tail_to_video_seconds * fps))
+        )
+
+        if tail_gap > 0 and tail_gap <= max_tail_to_video_frames:
+            highlight_frame_ranges[-1][1] = last_frame_index
+    
+    # ─────────────────────────────────────────────────────────────────────────
+    # Tiny "tail" extension for overlay → main transitions.
+    #
+    # We extend each overlay segment by a small fixed number of frames
+    # (e.g. 1 frame ≈ 40ms at 25fps), but:
+    #   - never beyond the first frame of the NEXT overlay, and
+    #   - never beyond the last frame of the video.
+    #
+    # This lets the final phonemes of the last word (like the "er" in "danger")
+    # still be visually covered by the overlay instead of flashing back to main.
+    # ─────────────────────────────────────────────────────────────────────────
+    overlay_tail_frames = 1  # 1 frame ≈ 0.04s at 25fps
+
+    if overlay_tail_frames > 0 and total_frames > 0:
+        last_frame_index = total_frames - 1
+        for i, rng in enumerate(highlight_frame_ranges):
+            start_f, end_f, seg_idx = rng
+
+            # Where does the next overlay start?
+            if i + 1 < len(highlight_frame_ranges):
+                next_start = highlight_frame_ranges[i + 1][0]
             else:
-                prev_range[1] = max(prev_start, min(prev_end, curr_start - 1))
+                # No next overlay: treat video end as the next boundary
+                next_start = total_frames
 
-            adjusted_curr_start = max(curr_start, prev_range[1] + 1)
-            curr_range[0] = min(adjusted_curr_start, curr_range[1])
+            # We can extend up to:
+            #   - end_f + overlay_tail_frames
+            #   - but strictly before next_start (so we don't collide with next overlay)
+            #   - and not beyond last_frame_index
+            max_end = min(end_f + overlay_tail_frames, next_start - 1, last_frame_index)
+
+            if max_end > end_f:
+                rng[1] = max_end
+
+
+
+    # DEBUG: log all highlight ranges after non-overlap adjustment
+    logger.info("  [HFR] Highlight frame ranges (after adjust):")
+    for start_f, end_f, seg_idx in highlight_frame_ranges:
+        seg = highlight_segments[seg_idx]
+        sw = int(seg["start_word"])
+        ew = int(seg["end_word"])
+        st = transcript[sw]["start_time"]
+        et = transcript[ew]["end_time"]
+        words = " ".join(
+            entry["word"] for entry in transcript[sw : ew + 1]
+        )
+        clip = seg.get("clip_path")
+        logger.info(
+            "  [HFR] seg=%d clip=%s frames=%d-%d time=%.3f-%.3fs words=%s",
+            seg_idx,
+            clip,
+            start_f,
+            end_f,
+            st,
+            et,
+            words,
+        )
+
 
     frame_index = 0
     highlight_ranges_for_words = [
         (seg["start_word"], seg["end_word"]) for seg in highlight_segments
     ]
+    prev_active_overlay_index: Optional[int] = None
+    logger.info("  [VIDEO PROCESSING] Starting frame processing loop...")
 
     while True:
         ret, frame = cap.read()
@@ -1529,14 +1943,13 @@ def process_video_with_overlays(
 
         frame = crop_to_aspect_ratio(frame, target_aspect_ratio)
 
-        # Use actual video position for accurate timing (more reliable than frame_index calculation)
-        # This ensures perfect sync even if video has variable frame rate or frame drops
+        # Use actual video position for accurate timing when available
         pos_msec = cap.get(cv2.CAP_PROP_POS_MSEC)
         if pos_msec >= 0:
             current_time = pos_msec / 1000.0
         else:
-            # Fallback to frame_index calculation if position not available
             current_time = frame_index / fps
+
         active_overlay_index: Optional[int] = None
         segment_start_frame: Optional[int] = None
         for start_f, end_f, seg_idx in highlight_frame_ranges:
@@ -1544,124 +1957,195 @@ def process_video_with_overlays(
                 active_overlay_index = seg_idx
                 segment_start_frame = start_f
                 break
+        
+        # DEBUG: log overlay activation / deactivation edges
+        if active_overlay_index != prev_active_overlay_index:
+            if active_overlay_index is None:
+                logger.info(
+                    "  [OVERLAY] frame=%d time=%.3fs -> NO OVERLAY (prev seg=%s)",
+                    frame_index,
+                    current_time,
+                    str(prev_active_overlay_index),
+                )
+            else:
+                seg = highlight_segments[active_overlay_index]
+                sw = int(seg["start_word"])
+                ew = int(seg["end_word"])
+                st = transcript[sw]["start_time"]
+                et = transcript[ew]["end_time"]
+                words = " ".join(
+                    entry["word"] for entry in transcript[sw : ew + 1]
+                )
+                clip = segment_clip_paths[active_overlay_index]
+                logger.info(
+                    "  [OVERLAY] frame=%d time=%.3fs -> seg=%d clip=%s "
+                    "words[%d:%d](%.3f-%.3fs): %s",
+                    frame_index,
+                    current_time,
+                    active_overlay_index,
+                    clip,
+                    sw,
+                    ew,
+                    st,
+                    et,
+                    words,
+                )
+            prev_active_overlay_index = active_overlay_index
+
 
         if active_overlay_index is not None:
             clip_path = segment_clip_paths[active_overlay_index]
             if clip_path:
                 clip_info = clip_state.get(clip_path)
                 if clip_info is not None:
-                    current_subtitle_index = highlight_subtitle_indices[
-                        active_overlay_index
-                    ]
-                    current_segment_index = clip_info.get("current_segment_index")
-                    if current_segment_index != active_overlay_index:
-                        if current_segment_index is not None:
-                            clip_info["last_segment_index"] = current_segment_index
-                        if clip_info.get("current_subtitle_index") is not None:
-                            clip_info["last_subtitle_index"] = clip_info[
-                                "current_subtitle_index"
-                            ]
-                        prev_segment_index = clip_info.get("last_segment_index")
-                        prev_subtitle_index = clip_info.get("last_subtitle_index")
-                        if subtitle_segments:
-                            should_continue = (
-                                prev_subtitle_index is not None
-                                and current_subtitle_index is not None
-                                and current_subtitle_index == prev_subtitle_index + 1
+                    overlay_cap = clip_info["capture"]
+                    if overlay_cap is not None and not clip_info.get(
+                        "finished", False
+                    ):
+                        current_subtitle_index = highlight_subtitle_indices[
+                            active_overlay_index
+                        ]
+                        current_segment_index = clip_info.get(
+                            "current_segment_index"
+                        )
+
+                        if current_segment_index != active_overlay_index:
+                            # We are switching to a new segment for this clip
+                            if current_segment_index is not None:
+                                clip_info["last_segment_index"] = (
+                                    current_segment_index
+                                )
+                            if clip_info.get("current_subtitle_index") is not None:
+                                clip_info["last_subtitle_index"] = clip_info[
+                                    "current_subtitle_index"
+                                ]
+
+                            prev_segment_index = clip_info.get("last_segment_index")
+                            prev_subtitle_index = clip_info.get("last_subtitle_index")
+
+                            if subtitle_segments:
+                                should_continue = (
+                                    prev_subtitle_index is not None
+                                    and current_subtitle_index is not None
+                                    and current_subtitle_index
+                                    == prev_subtitle_index + 1
+                                )
+                            else:
+                                should_continue = (
+                                    prev_segment_index is not None
+                                    and active_overlay_index
+                                    == prev_segment_index + 1
+                                )
+
+                            if not should_continue:
+                                # NEW segment with this clip: sync clip start with segment start.
+                                if segment_start_frame is None:
+                                    frames_into_segment = 0
+                                else:
+                                    frames_into_segment = max(
+                                        0, frame_index - segment_start_frame
+                                    )
+
+                                clip_info["next_frame"] = frames_into_segment
+                                clip_info["seek_frame"] = frames_into_segment
+                                clip_info["needs_seek"] = True
+                                clip_info["continuation_pending"] = False
+                                clip_info["frames_to_drop"] = 0
+                                clip_info["last_frame"] = None
+                                clip_info["hold_last_frame"] = False
+                                clip_info["last_capture_index"] = -1
+                            else:
+                                target_next = max(
+                                    int(clip_info.get("next_frame", 0)), 0
+                                )
+                                clip_info["seek_frame"] = target_next
+                                clip_info["needs_seek"] = True
+                                clip_info["continuation_pending"] = True
+                                clip_info["frames_to_drop"] = 0
+                                clip_info["hold_last_frame"] = False
+
+                            clip_info["finished"] = (
+                                clip_info["total_frames"] <= 0
+                            )
+                            clip_info["current_segment_index"] = (
+                                active_overlay_index
+                            )
+                            clip_info["current_subtitle_index"] = (
+                                current_subtitle_index
                             )
                         else:
-                            should_continue = (
-                                prev_segment_index is not None
-                                and active_overlay_index == prev_segment_index + 1
+                            clip_info["current_subtitle_index"] = (
+                                current_subtitle_index
                             )
-                        if not should_continue:
-                            # Reset clip to start from beginning when segment starts
-                            # Calculate how many frames into the segment we are
-                            frames_into_segment = max(0, frame_index - segment_start_frame)
-                            # Start clip synchronized with segment: if segment starts at frame 100
-                            # and we're at frame 100, show clip frame 0. If we're at frame 101, show clip frame 1.
-                            clip_info["next_frame"] = frames_into_segment
-                            clip_info["seek_frame"] = frames_into_segment  # Seek directly to the correct frame
-                            clip_info["needs_seek"] = True
-                            clip_info["continuation_pending"] = False
-                            clip_info["frames_to_drop"] = 0
-                            clip_info["last_frame"] = None
-                            clip_info["hold_last_frame"] = False
-                            clip_info["last_capture_index"] = -1
-                        else:
-                            target_next = max(int(clip_info.get("next_frame", 0)), 0)
-                            clip_info["seek_frame"] = target_next
-                            clip_info["needs_seek"] = True
-                            clip_info["continuation_pending"] = True
-                            clip_info["frames_to_drop"] = 0
-                            clip_info["hold_last_frame"] = False
-                        clip_info["finished"] = clip_info["total_frames"] <= 0
-                        clip_info["current_segment_index"] = active_overlay_index
-                        clip_info["current_subtitle_index"] = current_subtitle_index
-                    else:
-                        clip_info["current_subtitle_index"] = current_subtitle_index
 
-                    overlay_total_frames = clip_info["total_frames"]
-                    current_index = int(clip_info.get("next_frame", 0))
-                    frame_to_overlay: Optional[np.ndarray] = None
+                        overlay_total_frames = clip_info["total_frames"]
+                        current_index = int(clip_info.get("next_frame", 0))
+                        frame_to_overlay: Optional[np.ndarray] = None
 
-                    if overlay_total_frames <= 0:
-                        frame_to_overlay = clip_info.get("last_frame")
-                        clip_info["next_frame"] = current_index + 1
-                        clip_info["finished"] = frame_to_overlay is None
-                    else:
-                        overlay_cap = clip_info["capture"]
-                        
-                        # No looping - if we've reached the end, hold the last frame
-                        if current_index >= overlay_total_frames:
-                            # Clip has ended, hold the last frame
+                        if overlay_total_frames <= 0:
                             frame_to_overlay = clip_info.get("last_frame")
-                            clip_info["finished"] = frame_to_overlay is None
                         else:
-                            # Still within clip bounds, read the next frame
-                            last_capture_index = clip_info.get("last_capture_index", -1)
+                            last_capture_index = clip_info.get(
+                                "last_capture_index", -1
+                            )
                             expected_next = (
                                 last_capture_index + 1
-                                if last_capture_index != -1 and last_capture_index < overlay_total_frames - 1
+                                if last_capture_index != -1
+                                and last_capture_index
+                                < overlay_total_frames - 1
                                 else current_index
                             )
-                            
-                            if clip_info.get("needs_seek", False) or current_index != expected_next:
-                                overlay_cap.set(cv2.CAP_PROP_POS_FRAMES, current_index)
+
+                            if clip_info.get(
+                                "needs_seek", False
+                            ) or current_index != expected_next:
+                                overlay_cap.set(
+                                    cv2.CAP_PROP_POS_FRAMES, current_index
+                                )
                                 clip_info["needs_seek"] = False
-                            
+
                             ret_o, overlay_frame = overlay_cap.read()
                             if not ret_o:
-                                # Failed to read, use last frame
-                                clip_info["needs_seek"] = True
-                                frame_to_overlay = clip_info.get("last_frame")
-                                clip_info["finished"] = frame_to_overlay is None
-                            else:
-                                frame_to_overlay = overlay_frame
+                                clip_info["finished"] = True
+                                overlay_frame = clip_info.get("last_frame")
+
+                            if overlay_frame is not None:
                                 clip_info["last_frame"] = overlay_frame
                                 clip_info["last_capture_index"] = current_index
-                                clip_info["finished"] = False
-                        
-                        clip_info["next_frame"] = current_index + 1
+                                frame_to_overlay = overlay_frame
+                                clip_info["next_frame"] = current_index + 1
+                            else:
+                                frame_to_overlay = clip_info.get("last_frame")
 
-                    if frame_to_overlay is not None:
-                        overlay_frame = crop_to_aspect_ratio(
-                            frame_to_overlay, target_ratio=target_aspect_ratio
-                        )
-                        overlay_frame = resize_overlay_for_canvas(
-                            overlay_frame,
-                            canvas_width=width,
-                            canvas_height=height,
-                            aspect_ratio=target_aspect_ratio,
-                        )
-                        overlay_h, overlay_w = overlay_frame.shape[:2]
-                        x_start = (width - overlay_w) // 2
-                        y_start = (height - overlay_h) // 2
-                        frame[
-                            y_start : y_start + overlay_h,
-                            x_start : x_start + overlay_w,
-                        ] = overlay_frame
+                        if frame_to_overlay is not None:
+                            # Ensure the overlay uses the *same* crop and canvas
+                            # size as the main video so they line up perfectly.
+                            # 1) Crop the B-roll to the target aspect ratio.
+                            overlay_cropped = crop_to_aspect_ratio(
+                                frame_to_overlay, target_aspect_ratio
+                            )
 
+                            oh, ow = overlay_cropped.shape[:2]
+                            if oh > 0 and ow > 0:
+                                h, w = frame.shape[:2]
+
+                                # 2) Resize the cropped overlay to exactly fill
+                                #    the current frame. Because both `frame` and
+                                #    `overlay_cropped` share the same aspect
+                                #    ratio, this does *not* distort the image.
+                            if ow != w or oh != h:
+                                resized_overlay = cv2.resize(
+                                    overlay_cropped, (w, h)
+                                )
+                            else:
+                                resized_overlay = overlay_cropped
+
+                            # 3) Replace the entire frame with the overlay so
+                            #    the original and B-roll align pixel-perfectly.
+                            frame[:, :] = resized_overlay
+
+
+        # Draw subtitles on this frame
         frame_with_subtitles = draw_subtitle_on_frame(
             frame,
             transcript,
@@ -1680,21 +2164,26 @@ def process_video_with_overlays(
         if overlay_cap is not None:
             overlay_cap.release()
     writer.release()
-    
-    # Clean up temporary slowed-down clip files
+
+    # Clean up any temporary slowed-down clip files (should be empty now)
     for temp_file in temp_files:
         try:
             if os.path.exists(temp_file):
                 os.remove(temp_file)
                 logger.info(f"  [CLEANUP] Removed temporary file: {temp_file}")
         except Exception as e:
-            logger.warning(f"  [CLEANUP] Could not remove temporary file {temp_file}: {e}")
-    
-    step_duration = time.time() - step_start
-    logger.info(f"  [VIDEO PROCESSING] ✓ Completed processing {frame_index} frames in {step_duration:.2f}s ({step_duration/60:.2f} min)")
-    if step_duration > 0:
-        logger.info(f"  [VIDEO PROCESSING] Average processing speed: {frame_index/step_duration:.2f} fps")
+            logger.warning(
+                f"  [CLEANUP] Could not remove temporary file {temp_file}: {e}"
+            )
 
+    step_duration = time.time() - step_start
+    logger.info(
+        f"  [VIDEO PROCESSING] ✓ Completed processing {frame_index} frames in {step_duration:.2f}s ({step_duration/60:.2f} min)"
+    )
+    if step_duration > 0:
+        logger.info(
+            f"  [VIDEO PROCESSING] Average processing speed: {frame_index/step_duration:.2f} fps"
+        )
 
 def merge_audio_tracks(
     silent_video_path: str,

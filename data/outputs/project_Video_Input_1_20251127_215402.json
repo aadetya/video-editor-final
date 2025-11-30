@@ -1,0 +1,126 @@
+{
+  "project_info": {
+    "created_at": "2025-11-27T21:54:02.524581",
+    "video_path": "uploads/Video_Input_1.mp4",
+    "output_filename": "output_Video_Input_1.mp4",
+    "output_path": "outputs/output_Video_Input_1.mp4",
+    "aspect_ratio": "4:5"
+  },
+  "highlights": [
+    {
+      "phrase": "Independent crash testing showed",
+      "start_word": 18,
+      "end_word": 21,
+      "clip_path": "clips/4.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "those budget options fail catastrophically.",
+      "start_word": 22,
+      "end_word": 26,
+      "clip_path": "clips/20.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "The clips break.",
+      "start_word": 27,
+      "end_word": 29,
+      "clip_path": "clips/21.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "In the moment you need protection most,",
+      "start_word": 33,
+      "end_word": 39,
+      "clip_path": "clips/3.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "This is exactly why Baby Gaurd Belt was created.",
+      "start_word": 43,
+      "end_word": 51,
+      "clip_path": "clips/6.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "It's a crash tested, certified solution",
+      "start_word": 58,
+      "end_word": 63,
+      "clip_path": "clips/5.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "that clips onto your seat and positions",
+      "start_word": 64,
+      "end_word": 70,
+      "clip_path": "clips/7.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "your seatbelt safely below your belly.",
+      "start_word": 71,
+      "end_word": 76,
+      "clip_path": "clips/11.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "Away from your vulnerable baby.",
+      "start_word": 77,
+      "end_word": 81,
+      "clip_path": "clips/13.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "Because it's been tested.",
+      "start_word": 91,
+      "end_word": 94,
+      "clip_path": "clips/16.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "Because it works.",
+      "start_word": 95,
+      "end_word": 97,
+      "clip_path": "clips/15.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    },
+    {
+      "phrase": "so get yours to experience real peace of mind on the road.",
+      "start_word": 108,
+      "end_word": 119,
+      "clip_path": "clips/26.mp4",
+      "music_path": null,
+      "music_volume": 1,
+      "occurrence": 1
+    }
+  ],
+  "transcript": [],
+  "subtitle_sentences": [],
+  "statistics": {
+    "total_highlights": 12,
+    "total_transcript_words": 0,
+    "total_subtitle_sentences": 0
+  }
+}

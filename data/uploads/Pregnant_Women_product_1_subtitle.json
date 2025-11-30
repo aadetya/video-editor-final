@@ -1,0 +1,857 @@
+[
+    {
+        "word": "If",
+        "start_time": 0.031,
+        "end_time": 0.191
+    },
+    {
+        "word": "you're",
+        "start_time": 0.232,
+        "end_time": 0.412
+    },
+    {
+        "word": "pregnant",
+        "start_time": 0.432,
+        "end_time": 0.753
+    },
+    {
+        "word": "and",
+        "start_time": 0.793,
+        "end_time": 0.873
+    },
+    {
+        "word": "driving",
+        "start_time": 0.893,
+        "end_time": 1.254
+    },
+    {
+        "word": "right",
+        "start_time": 1.294,
+        "end_time": 1.475
+    },
+    {
+        "word": "now,",
+        "start_time": 1.515,
+        "end_time": 1.715
+    },
+    {
+        "word": "there's",
+        "start_time": 1.815,
+        "end_time": 1.996
+    },
+    {
+        "word": "a",
+        "start_time": 2.036,
+        "end_time": 2.056
+    },
+    {
+        "word": "73%",
+        "start_time": 2.076,
+        "end_time": 2.557
+    },
+    {
+        "word": "chance",
+        "start_time": 3.099,
+        "end_time": 3.7
+    },
+    {
+        "word": "you'll",
+        "start_time": 3.72,
+        "end_time": 3.901
+    },
+    {
+        "word": "put",
+        "start_time": 3.921,
+        "end_time": 4.021
+    },
+    {
+        "word": "in",
+        "start_time": 4.061,
+        "end_time": 4.101
+    },
+    {
+        "word": "your",
+        "start_time": 4.141,
+        "end_time": 4.242
+    },
+    {
+        "word": "baby",
+        "start_time": 4.282,
+        "end_time": 4.542
+    },
+    {
+        "word": "in",
+        "start_time": 4.582,
+        "end_time": 4.643
+    },
+    {
+        "word": "danger",
+        "start_time": 4.683,
+        "end_time": 5.104
+    },
+    {
+        "word": "and",
+        "start_time": 5.124,
+        "end_time": 5.545
+    },
+    {
+        "word": "you",
+        "start_time": 5.585,
+        "end_time": 5.685
+    },
+    {
+        "word": "don't",
+        "start_time": 5.745,
+        "end_time": 5.946
+    },
+    {
+        "word": "even",
+        "start_time": 6.046,
+        "end_time": 6.207
+    },
+    {
+        "word": "know",
+        "start_time": 6.247,
+        "end_time": 6.427
+    },
+    {
+        "word": "it.",
+        "start_time": 6.527,
+        "end_time": 6.587
+    },
+    {
+        "word": "I",
+        "start_time": 6.848,
+        "end_time": 6.948
+    },
+    {
+        "word": "had",
+        "start_time": 6.988,
+        "end_time": 7.109
+    },
+    {
+        "word": "no",
+        "start_time": 7.249,
+        "end_time": 7.47
+    },
+    {
+        "word": "idea",
+        "start_time": 7.49,
+        "end_time": 7.931
+    },
+    {
+        "word": "until",
+        "start_time": 7.971,
+        "end_time": 8.232
+    },
+    {
+        "word": "my",
+        "start_time": 8.272,
+        "end_time": 8.352
+    },
+    {
+        "word": "doctor",
+        "start_time": 8.412,
+        "end_time": 8.673
+    },
+    {
+        "word": "told",
+        "start_time": 8.733,
+        "end_time": 8.953
+    },
+    {
+        "word": "me,",
+        "start_time": 9.034,
+        "end_time": 9.174
+    },
+    {
+        "word": "most",
+        "start_time": 9.615,
+        "end_time": 9.816
+    },
+    {
+        "word": "pregnant",
+        "start_time": 9.896,
+        "end_time": 10.217
+    },
+    {
+        "word": "women",
+        "start_time": 10.257,
+        "end_time": 10.517
+    },
+    {
+        "word": "use",
+        "start_time": 10.537,
+        "end_time": 10.858
+    },
+    {
+        "word": "their",
+        "start_time": 10.898,
+        "end_time": 11.039
+    },
+    {
+        "word": "seatbelt",
+        "start_time": 11.119,
+        "end_time": 11.58
+    },
+    {
+        "word": "wrong.",
+        "start_time": 11.64,
+        "end_time": 11.901
+    },
+    {
+        "word": "The",
+        "start_time": 12.182,
+        "end_time": 12.282
+    },
+    {
+        "word": "lap",
+        "start_time": 12.322,
+        "end_time": 12.563
+    },
+    {
+        "word": "belt",
+        "start_time": 12.583,
+        "end_time": 12.843
+    },
+    {
+        "word": "rides",
+        "start_time": 12.923,
+        "end_time": 13.184
+    },
+    {
+        "word": "up",
+        "start_time": 13.204,
+        "end_time": 13.525
+    },
+    {
+        "word": "on",
+        "start_time": 13.625,
+        "end_time": 13.685
+    },
+    {
+        "word": "your",
+        "start_time": 13.705,
+        "end_time": 13.846
+    },
+    {
+        "word": "belly",
+        "start_time": 13.886,
+        "end_time": 14.227
+    },
+    {
+        "word": "instead",
+        "start_time": 14.347,
+        "end_time": 14.588
+    },
+    {
+        "word": "of",
+        "start_time": 14.628,
+        "end_time": 14.668
+    },
+    {
+        "word": "staying",
+        "start_time": 14.708,
+        "end_time": 14.969
+    },
+    {
+        "word": "low",
+        "start_time": 15.009,
+        "end_time": 15.329
+    },
+    {
+        "word": "on",
+        "start_time": 15.41,
+        "end_time": 15.47
+    },
+    {
+        "word": "your",
+        "start_time": 15.49,
+        "end_time": 15.63
+    },
+    {
+        "word": "hips.",
+        "start_time": 15.69,
+        "end_time": 16.352
+    },
+    {
+        "word": "And",
+        "start_time": 16.332,
+        "end_time": 16.592
+    },
+    {
+        "word": "when",
+        "start_time": 16.653,
+        "end_time": 16.773
+    },
+    {
+        "word": "you",
+        "start_time": 16.813,
+        "end_time": 16.953
+    },
+    {
+        "word": "break",
+        "start_time": 16.993,
+        "end_time": 17.294
+    },
+    {
+        "word": "hard",
+        "start_time": 17.354,
+        "end_time": 17.695
+    },
+    {
+        "word": "or",
+        "start_time": 17.815,
+        "end_time": 17.895
+    },
+    {
+        "word": "God",
+        "start_time": 17.955,
+        "end_time": 18.135
+    },
+    {
+        "word": "forbid",
+        "start_time": 18.176,
+        "end_time": 18.496
+    },
+    {
+        "word": "getting",
+        "start_time": 18.556,
+        "end_time": 18.797
+    },
+    {
+        "word": "an",
+        "start_time": 18.837,
+        "end_time": 18.877
+    },
+    {
+        "word": "accident,",
+        "start_time": 19.037,
+        "end_time": 19.498
+    },
+    {
+        "word": "all",
+        "start_time": 19.538,
+        "end_time": 20.039
+    },
+    {
+        "word": "that",
+        "start_time": 20.079,
+        "end_time": 20.259
+    },
+    {
+        "word": "force",
+        "start_time": 20.36,
+        "end_time": 20.68
+    },
+    {
+        "word": "goes",
+        "start_time": 20.74,
+        "end_time": 20.901
+    },
+    {
+        "word": "straight",
+        "start_time": 21.061,
+        "end_time": 21.542
+    },
+    {
+        "word": "into",
+        "start_time": 21.602,
+        "end_time": 21.782
+    },
+    {
+        "word": "your",
+        "start_time": 21.822,
+        "end_time": 21.963
+    },
+    {
+        "word": "bump,",
+        "start_time": 22.003,
+        "end_time": 22.584
+    },
+    {
+        "word": "directly",
+        "start_time": 22.604,
+        "end_time": 23.285
+    },
+    {
+        "word": "onto",
+        "start_time": 23.426,
+        "end_time": 23.626
+    },
+    {
+        "word": "your",
+        "start_time": 23.666,
+        "end_time": 23.786
+    },
+    {
+        "word": "baby.",
+        "start_time": 23.826,
+        "end_time": 24.227
+    },
+    {
+        "word": "This",
+        "start_time": 24.287,
+        "end_time": 24.708
+    },
+    {
+        "word": "is",
+        "start_time": 24.768,
+        "end_time": 24.828
+    },
+    {
+        "word": "exactly",
+        "start_time": 24.908,
+        "end_time": 25.369
+    },
+    {
+        "word": "why",
+        "start_time": 25.429,
+        "end_time": 25.61
+    },
+    {
+        "word": "baby",
+        "start_time": 25.63,
+        "end_time": 26.091
+    },
+    {
+        "word": "guard",
+        "start_time": 26.191,
+        "end_time": 26.531
+    },
+    {
+        "word": "belt",
+        "start_time": 26.571,
+        "end_time": 26.832
+    },
+    {
+        "word": "was",
+        "start_time": 26.872,
+        "end_time": 26.992
+    },
+    {
+        "word": "created.",
+        "start_time": 27.052,
+        "end_time": 27.634
+    },
+    {
+        "word": "It's",
+        "start_time": 27.674,
+        "end_time": 28.114
+    },
+    {
+        "word": "not",
+        "start_time": 28.195,
+        "end_time": 28.395
+    },
+    {
+        "word": "just",
+        "start_time": 28.475,
+        "end_time": 28.756
+    },
+    {
+        "word": "another",
+        "start_time": 28.896,
+        "end_time": 29.217
+    },
+    {
+        "word": "pregnancy",
+        "start_time": 29.277,
+        "end_time": 29.697
+    },
+    {
+        "word": "gadget,",
+        "start_time": 29.738,
+        "end_time": 30.198
+    },
+    {
+        "word": "it's",
+        "start_time": 30.559,
+        "end_time": 30.679
+    },
+    {
+        "word": "a",
+        "start_time": 30.719,
+        "end_time": 30.739
+    },
+    {
+        "word": "crash-tested,",
+        "start_time": 30.84,
+        "end_time": 31.601
+    },
+    {
+        "word": "certified",
+        "start_time": 31.741,
+        "end_time": 32.322
+    },
+    {
+        "word": "solution",
+        "start_time": 32.363,
+        "end_time": 32.863
+    },
+    {
+        "word": "that",
+        "start_time": 32.904,
+        "end_time": 33.064
+    },
+    {
+        "word": "clips",
+        "start_time": 33.124,
+        "end_time": 33.405
+    },
+    {
+        "word": "onto",
+        "start_time": 33.485,
+        "end_time": 33.645
+    },
+    {
+        "word": "your",
+        "start_time": 33.705,
+        "end_time": 33.825
+    },
+    {
+        "word": "seat",
+        "start_time": 33.865,
+        "end_time": 34.206
+    },
+    {
+        "word": "and",
+        "start_time": 34.186,
+        "end_time": 34.527
+    },
+    {
+        "word": "positions",
+        "start_time": 34.567,
+        "end_time": 34.968
+    },
+    {
+        "word": "your",
+        "start_time": 35.008,
+        "end_time": 35.128
+    },
+    {
+        "word": "seatbelt",
+        "start_time": 35.168,
+        "end_time": 35.629
+    },
+    {
+        "word": "safely",
+        "start_time": 35.729,
+        "end_time": 36.17
+    },
+    {
+        "word": "below",
+        "start_time": 36.19,
+        "end_time": 36.692
+    },
+    {
+        "word": "your",
+        "start_time": 36.712,
+        "end_time": 36.892
+    },
+    {
+        "word": "belly,",
+        "start_time": 36.932,
+        "end_time": 37.253
+    },
+    {
+        "word": "away",
+        "start_time": 37.293,
+        "end_time": 38.115
+    },
+    {
+        "word": "from",
+        "start_time": 38.155,
+        "end_time": 38.435
+    },
+    {
+        "word": "your",
+        "start_time": 38.476,
+        "end_time": 38.596
+    },
+    {
+        "word": "vulnerable",
+        "start_time": 38.656,
+        "end_time": 39.077
+    },
+    {
+        "word": "baby.",
+        "start_time": 39.097,
+        "end_time": 39.558
+    },
+    {
+        "word": "The",
+        "start_time": 39.578,
+        "end_time": 39.979
+    },
+    {
+        "word": "first",
+        "start_time": 40.039,
+        "end_time": 40.28
+    },
+    {
+        "word": "time",
+        "start_time": 40.32,
+        "end_time": 40.48
+    },
+    {
+        "word": "I",
+        "start_time": 40.5,
+        "end_time": 40.6
+    },
+    {
+        "word": "drove",
+        "start_time": 40.64,
+        "end_time": 40.901
+    },
+    {
+        "word": "with",
+        "start_time": 40.961,
+        "end_time": 41.101
+    },
+    {
+        "word": "it,",
+        "start_time": 41.182,
+        "end_time": 41.282
+    },
+    {
+        "word": "I",
+        "start_time": 41.382,
+        "end_time": 41.442
+    },
+    {
+        "word": "literally",
+        "start_time": 41.603,
+        "end_time": 42.124
+    },
+    {
+        "word": "cried.",
+        "start_time": 42.164,
+        "end_time": 42.926
+    },
+    {
+        "word": "The",
+        "start_time": 42.966,
+        "end_time": 43.346
+    },
+    {
+        "word": "belt",
+        "start_time": 43.387,
+        "end_time": 43.647
+    },
+    {
+        "word": "finally",
+        "start_time": 43.828,
+        "end_time": 44.309
+    },
+    {
+        "word": "stayed",
+        "start_time": 44.369,
+        "end_time": 44.73
+    },
+    {
+        "word": "where",
+        "start_time": 44.77,
+        "end_time": 45.05
+    },
+    {
+        "word": "it",
+        "start_time": 45.09,
+        "end_time": 45.15
+    },
+    {
+        "word": "should",
+        "start_time": 45.211,
+        "end_time": 45.391
+    },
+    {
+        "word": "be,",
+        "start_time": 45.471,
+        "end_time": 45.672
+    },
+    {
+        "word": "automatically.",
+        "start_time": 45.712,
+        "end_time": 47.055
+    },
+    {
+        "word": "No",
+        "start_time": 47.075,
+        "end_time": 47.115
+    },
+    {
+        "word": "more",
+        "start_time": 47.536,
+        "end_time": 47.857
+    },
+    {
+        "word": "pulling",
+        "start_time": 47.897,
+        "end_time": 48.177
+    },
+    {
+        "word": "it",
+        "start_time": 48.197,
+        "end_time": 48.237
+    },
+    {
+        "word": "down",
+        "start_time": 48.298,
+        "end_time": 48.518
+    },
+    {
+        "word": "every",
+        "start_time": 48.558,
+        "end_time": 48.839
+    },
+    {
+        "word": "five",
+        "start_time": 48.899,
+        "end_time": 49.2
+    },
+    {
+        "word": "minutes,",
+        "start_time": 49.26,
+        "end_time": 49.62
+    },
+    {
+        "word": "no",
+        "start_time": 49.861,
+        "end_time": 50.021
+    },
+    {
+        "word": "more",
+        "start_time": 50.061,
+        "end_time": 50.222
+    },
+    {
+        "word": "anxiety",
+        "start_time": 50.302,
+        "end_time": 51.004
+    },
+    {
+        "word": "every",
+        "start_time": 51.044,
+        "end_time": 51.344
+    },
+    {
+        "word": "time",
+        "start_time": 51.384,
+        "end_time": 51.585
+    },
+    {
+        "word": "I",
+        "start_time": 51.665,
+        "end_time": 51.725
+    },
+    {
+        "word": "break.",
+        "start_time": 51.765,
+        "end_time": 52.166
+    },
+    {
+        "word": "They",
+        "start_time": 52.407,
+        "end_time": 52.567
+    },
+    {
+        "word": "even",
+        "start_time": 52.687,
+        "end_time": 52.888
+    },
+    {
+        "word": "let",
+        "start_time": 52.908,
+        "end_time": 53.008
+    },
+    {
+        "word": "you",
+        "start_time": 53.048,
+        "end_time": 53.148
+    },
+    {
+        "word": "try",
+        "start_time": 53.188,
+        "end_time": 53.429
+    },
+    {
+        "word": "it",
+        "start_time": 53.469,
+        "end_time": 53.549
+    },
+    {
+        "word": "30",
+        "start_time": 53.569,
+        "end_time": 53.609
+    },
+    {
+        "word": "days",
+        "start_time": 54.171,
+        "end_time": 54.511
+    },
+    {
+        "word": "risk-free,",
+        "start_time": 54.551,
+        "end_time": 55.393
+    },
+    {
+        "word": "so",
+        "start_time": 55.694,
+        "end_time": 55.834
+    },
+    {
+        "word": "get",
+        "start_time": 55.894,
+        "end_time": 56.055
+    },
+    {
+        "word": "yours",
+        "start_time": 56.075,
+        "end_time": 56.456
+    },
+    {
+        "word": "to",
+        "start_time": 56.476,
+        "end_time": 56.616
+    },
+    {
+        "word": "experience",
+        "start_time": 56.676,
+        "end_time": 57.217
+    },
+    {
+        "word": "real",
+        "start_time": 57.378,
+        "end_time": 57.678
+    },
+    {
+        "word": "peace",
+        "start_time": 57.739,
+        "end_time": 57.939
+    },
+    {
+        "word": "of",
+        "start_time": 57.979,
+        "end_time": 58.019
+    },
+    {
+        "word": "mind",
+        "start_time": 58.079,
+        "end_time": 58.36
+    },
+    {
+        "word": "on",
+        "start_time": 58.42,
+        "end_time": 58.48
+    },
+    {
+        "word": "the",
+        "start_time": 58.52,
+        "end_time": 58.58
+    },
+    {
+        "word": "road.",
+        "start_time": 58.641,
+        "end_time": 59.282
+    }
+]
