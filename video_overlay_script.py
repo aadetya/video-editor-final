@@ -1766,8 +1766,54 @@ def process_video_with_overlays(
         # covers the last word, without bleeding into the next spoken word.
         phrase_end_time = transcript[end_word]["end_time"]
 
+        # How much earlier than the first word we want the overlay to appear
+        # (so we don't see the first syllable on the main shot).
+        lead_margin = 0.15      # try 0.15s; tweak 0.12–0.18 if needed
+        gap_threshold = 0.15    # defines "this is a main→overlay gap"
+
         # Small global tail margin in seconds (tweakable)
         tail_margin = 0.12  # try 0.12; bump more if required
+        # Default: no early shift
+        start_time_early = start_time
+
+        if idx > 0:
+            prev_seg = highlight_segments[idx - 1]
+            prev_end_word = int(prev_seg["end_word"])
+            prev_end_time = transcript[prev_end_word]["end_time"]
+
+            gap = start_time - prev_end_time
+
+            if gap > gap_threshold:
+                # MAIN → OVERLAY transition.
+                #
+                # Start slightly before the phrase, but never before the previous
+                # highlight actually ended. This keeps previous overlay intact,
+                # and pulls the new overlay into the last part of the "main" gap.
+                tentative_early = start_time - lead_margin
+                start_time_early = max(prev_end_time, tentative_early)
+                logger.info(
+                "[HFR_SETUP] seg=%d MAIN→OVERLAY gap=%.3fs "
+                "start=%.3fs early=%.3fs prev_end=%.3fs",
+                idx,
+                gap,
+                start_time,
+                start_time_early,
+                prev_end_time,
+                )
+            else:
+                # OVERLAY → OVERLAY transition. Don't shift earlier here.
+                start_time_early = start_time
+                logger.info(
+                "[HFR_SETUP] seg=%d OVERLAY→OVERLAY gap=%.3fs "
+                "start=%.3fs (no early shift)",
+                idx,
+                gap,
+                start_time,
+                )
+        else:
+            # First overlay: safe to pull slightly earlier
+            start_time_early = max(0.0, start_time - lead_margin)
+
 
         # Start by adding the tail margin
         extended_end_time = phrase_end_time + tail_margin
@@ -1787,12 +1833,26 @@ def process_video_with_overlays(
         # Convert to frames
         #   start_frame: floor so we never start late
         #   end_frame:   ceil - 1 so we fully cover up to max_safe_end_time
-        start_frame = int(math.floor(start_time * fps))
+        start_frame = int(math.floor(start_time_early * fps))
         end_frame = int(math.ceil(max_safe_end_time * fps)) - 1
         if end_frame < start_frame:
             end_frame = start_frame
 
         highlight_frame_ranges.append([start_frame, end_frame, idx])
+
+        # Log final timing decision for this segment
+        logger.info(
+        "[HFR_SETUP] seg=%d words[%d:%d] "
+        "start=%.3fs early=%.3fs end=%.3fs -> frames=[%d,%d]",
+        idx,
+        start_word,
+        end_word,
+        start_time,
+        start_time_early,
+        max_safe_end_time,
+        start_frame,
+        end_frame,
+        )
 
 
         # Track which subtitle block this phrase sits in (for subtitles logic)

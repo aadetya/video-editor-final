@@ -165,8 +165,16 @@ function handleMusicSelection(e) {
 }
 
 function checkUploadReady() {
-  const hasVideo = mainVideoInput.files.length > 0;
-  const hasTranscript = transcriptFileInput.files.length > 0;
+  const videoInputEl = document.getElementById("main-video-input");
+  const transcriptInputEl = document.getElementById("transcript-file-input");
+
+  const hasVideo =
+    videoInputEl && videoInputEl.files && videoInputEl.files.length > 0;
+  const hasTranscript =
+    transcriptInputEl &&
+    transcriptInputEl.files &&
+    transcriptInputEl.files.length > 0;
+
   uploadBtn.disabled = !(hasVideo && hasTranscript);
 }
 
@@ -383,8 +391,20 @@ function applyAutoHighlightsFromMapping() {
 // =========================
 
 async function uploadVideo() {
-  const videoFile = mainVideoInput.files[0];
-  const txtFile = transcriptFileInput.files[0];
+  // Re-resolve the inputs in case the DOM was re-rendered
+  const videoInputEl = document.getElementById("main-video-input");
+  const transcriptInputEl = document.getElementById("transcript-file-input");
+
+  const videoFile =
+    videoInputEl && videoInputEl.files && videoInputEl.files[0]
+      ? videoInputEl.files[0]
+      : null;
+
+  const txtFile =
+    transcriptInputEl && transcriptInputEl.files && transcriptInputEl.files[0]
+      ? transcriptInputEl.files[0]
+      : null;
+
 
   if (!videoFile || !txtFile) {
     alert("Please select both video and TXT file");

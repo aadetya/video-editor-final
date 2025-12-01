@@ -22,6 +22,20 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
+
+from flask import request
+
+def log_request_context(tag: str):
+    logger.info(
+        "[%s] %s %s content_length=%s, remote_addr=%s, files=%s",
+        tag,
+        request.method,
+        request.path,
+        request.content_length,
+        request.remote_addr,
+        list(request.files.keys()),
+    )
+
 from video_overlay_script import (
     ProjectConfig,
     HighlightAssignment,
@@ -238,7 +252,10 @@ def test_route():
 @app.route('/upload-video', methods=['POST'])
 def upload_video():
     """Handle main video upload and generate transcript."""
+    log_request_context("UPLOAD_VIDEO")
+
     if 'video' not in request.files:
+        logger.warning("[UPLOAD_VIDEO] No 'video' file in request")
         return jsonify({'error': 'No video file provided'}), 400
 
     file = request.files['video']
@@ -252,7 +269,13 @@ def upload_video():
         # Save the uploaded video
         filename = secure_filename(file.filename)
         video_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        logger.info("[UPLOAD_VIDEO] Saving video as %s", video_path)
         file.save(video_path)
+        logger.info(
+            "[UPLOAD_VIDEO] Saved video (%s), size ~%.2f MB",
+            filename,
+            os.path.getsize(video_path) / (1024 * 1024),
+        )
 
         # Generate transcript using Whisper
         whisper_model = request.form.get('whisper_model', 'base')
@@ -261,6 +284,10 @@ def upload_video():
         # Extract just the words for display
         words = [entry['word'] for entry in transcript]
         full_text = ' '.join(words)
+
+        logger.info(
+            "[UPLOAD_VIDEO] Transcript generated, words=%d", len(words)
+        )
 
         return jsonify({
             'success': True,
@@ -271,14 +298,17 @@ def upload_video():
         })
 
     except Exception as e:
+        logger.exception("[UPLOAD_VIDEO] Error processing video")
         return jsonify({'error': f'Error processing video: {str(e)}'}), 500
 
 
 @app.route('/upload-video-with-txt', methods=['POST'])
 def upload_video_with_txt():
     """Handle video upload with TXT transcript file."""
-    print("[DEBUG] ========== UPLOAD VIDEO WITH TXT CALLED ==========")
+    log_request_context("UPLOAD_VIDEO_WITH_TXT")
+
     if 'video' not in request.files:
+        logger.warning("[UPLOAD_VIDEO_WITH_TXT] No 'video' file in request")
         return jsonify({'error': 'No video file provided'}), 400
 
     if 'transcript_file' not in request.files:
@@ -301,13 +331,23 @@ def upload_video_with_txt():
         video_filename = secure_filename(video_file.filename)
         video_path = os.path.join(app.config['UPLOAD_FOLDER'], video_filename)
         video_file.save(video_path)
-        print(f"[DEBUG] Video saved to: {video_path}")
+        logger.info(
+            "[UPLOAD_VIDEO_WITH_TXT] Video saved to %s (%.2f MB)",
+            video_path,
+            os.path.getsize(video_path) / (1024 * 1024),
+        )
 
         # Read the transcript text and split by lines
         transcript_text = txt_file.read().decode('utf-8')
-        print(f"[DEBUG] Transcript text length: {len(transcript_text)}")
+        logger.info(
+            "[UPLOAD_VIDEO_WITH_TXT] Transcript text length=%d",
+            len(transcript_text),
+        )
         lines = [line.strip() for line in transcript_text.split('\n') if line.strip()]
-        print(f"[DEBUG] Found {len(lines)} lines in transcript")
+        logger.info(
+            "[UPLOAD_VIDEO_WITH_TXT] Parsed %d non-empty lines from transcript",
+            len(lines),
+        )
 
         # Generate transcript with evenly spaced timing
         from video_overlay_script import probe_video_metadata, evenly_spaced_transcript
@@ -348,7 +388,9 @@ def upload_video_with_txt():
             'word_count': len(words),
             'subtitles': subtitles
         }
-        print(f"[DEBUG] Returning response with {len(subtitles)} subtitles")
+        logger.info(
+            "[UPLOAD_VIDEO_WITH_TXT] Returning generated evenly-spaced transcript"
+        )
         return jsonify(response_data)
 
     except Exception as e:
@@ -361,7 +403,10 @@ def upload_video_with_txt():
 @app.route('/upload-clip', methods=['POST'])
 def upload_clip():
     """Handle clip/audio file upload for highlights."""
+    log_request_context("UPLOAD_CLIP")
+
     if 'file' not in request.files:
+        logger.warning("[UPLOAD_CLIP] No 'file' in request")
         return jsonify({'error': 'No file provided'}), 400
 
     file = request.files['file']
@@ -386,6 +431,13 @@ def upload_clip():
 
         file.save(save_path)
 
+        logger.info(
+            "[UPLOAD_CLIP] Saved %s file to %s (%.2f MB)",
+            "video" if is_video else "audio",
+            save_path,
+            os.path.getsize(save_path) / (1024 * 1024),
+        )
+
         return jsonify({
             'success': True,
             'file_path': save_path,
@@ -393,6 +445,7 @@ def upload_clip():
         })
 
     except Exception as e:
+        logger.exception("[UPLOAD_CLIP] Error uploading file")
         return jsonify({'error': f'Error uploading file: {str(e)}'}), 500
 
 
@@ -556,10 +609,9 @@ def process_video():
             'message': 'Video processed successfully!' + (' (Uploaded to S3)' if s3_video_url else ' (S3 upload failed)')
         })
 
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': f'Error processing video: {str(e)}'}), 500
+    except Exception:
+        logger.exception("[REQUEST] Unhandled error while processing video")
+        return jsonify({'error': 'Error processing video'}), 500
 
 
 @app.route('/download/<filename>')
@@ -767,8 +819,7 @@ def save_project():
         })
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("[SAVE PROJECT] Error while saving project")
         return jsonify({'error': f'Error saving project: {str(e)}'}), 500
 
 
