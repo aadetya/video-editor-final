@@ -1679,8 +1679,19 @@ def process_video_with_overlays(
                     clip_duration = float(clip_frame_count) / float(clip_fps)
 
                     # We want the clip to be at least as long as the longest
-                    # segment that uses it, plus a tiny safety margin (~1 frame).
-                    required_duration = target_duration + (1.0 / fps)
+                    # segment that uses it *including*:
+                    #   - the early lead-in used for MAIN→OVERLAY transitions
+                    #   - the small tail margin after the last word
+                    #   - a bit of slack for float / frame rounding
+                    #
+                    # In practice, from the logs, we were ending up about
+                    # 0.1–0.23s short, which is exactly when the overlay runs
+                    # out of frames right before the segment finishes.
+                    #
+                    # So we are gonna add a slightly larger fixed cushion instead of just
+                    # one frame.
+                    extra_margin = 0.30  # seconds; tweak if ever needed
+                    required_duration = target_duration + extra_margin
 
                     if clip_duration >= required_duration:
                         # Clip is already long enough; no slowdown necessary.
@@ -2165,9 +2176,27 @@ def process_video_with_overlays(
                                 clip_info["needs_seek"] = False
 
                             ret_o, overlay_frame = overlay_cap.read()
-                            if not ret_o:
-                                clip_info["finished"] = True
-                                overlay_frame = clip_info.get("last_frame")
+
+                            if not ret_o or overlay_frame is None:
+                                # Try one retry seek to be safe
+                                logger.warning(
+                                    "  [OVERLAY_READ_FAIL] seg=%d clip=%s frame_index=%d overlay_total_frames=%d",
+                                    active_overlay_index,
+                                    segment_clip_paths[active_overlay_index],
+                                    current_index,
+                                    overlay_total_frames,
+                                )
+
+                                # Attempt a re-seek and re-read once
+                                overlay_cap.set(cv2.CAP_PROP_POS_FRAMES, current_index)
+                                ret_o2, overlay_frame2 = overlay_cap.read()
+
+                                if ret_o2 and overlay_frame2 is not None:
+                                    overlay_frame = overlay_frame2
+                                else:
+                                    clip_info["finished"] = True
+                                    # Fall back to last_frame if we have one
+                                    overlay_frame = clip_info.get("last_frame")
 
                             if overlay_frame is not None:
                                 clip_info["last_frame"] = overlay_frame
@@ -2176,7 +2205,19 @@ def process_video_with_overlays(
                                 clip_info["next_frame"] = current_index + 1
                             else:
                                 frame_to_overlay = clip_info.get("last_frame")
-
+                        if active_overlay_index is not None and frame_to_overlay is None:
+                            logger.warning(
+                                "  [OVERLAY_MISS] frame=%d time=%.3fs seg=%d clip=%s "
+                                "(overlay_total_frames=%d, next_frame=%d, last_capture_index=%d, finished=%s)",
+                                frame_index,
+                                current_time,
+                                active_overlay_index,
+                                segment_clip_paths[active_overlay_index],
+                                overlay_total_frames,
+                                current_index,
+                                clip_info.get("last_capture_index", -1),
+                                clip_info.get("finished", False),
+                            )
                         if frame_to_overlay is not None:
                             # Ensure the overlay uses the *same* crop and canvas
                             # size as the main video so they line up perfectly.
