@@ -49,6 +49,191 @@
         </div>
       </section>
 
+      <!-- Batch Processing (Sequential) -->
+      <section class="card" id="batch-processing-section">
+        <h2>⚡ Batch Processing (Sequential)</h2>
+        <p class="instruction">
+          Add multiple batches (main video + subtitle text + clip mapping) and
+          process them one-by-one. Each batch will show a preview and download
+          link when it finishes. Use <strong>Edit</strong> to open the full
+          highlight + music editor below for that batch, then <strong>Save
+          Batch</strong> to queue your changes.
+        </p>
+
+        <div class="batch-toolbar">
+          <div class="batch-toolbar-left">
+            <button class="btn btn-primary" id="batch-add-btn" type="button">
+              ➕ Add Batch
+            </button>
+            <button
+              class="btn btn-success"
+              id="batch-start-btn"
+              type="button"
+              disabled
+            >
+              ▶️ Start Processing
+            </button>
+            <button
+              class="btn btn-secondary"
+              id="batch-stop-btn"
+              type="button"
+              disabled
+            >
+              ⏹ Stop Queue
+            </button>
+            <button class="btn btn-secondary" id="batch-clear-btn" type="button">
+              🧹 Clear
+            </button>
+          </div>
+
+          <div class="batch-toolbar-right">
+            <label for="batch-aspect-ratio" class="batch-label"
+              >Aspect ratio</label
+            >
+            <select id="batch-aspect-ratio" class="custom-select">
+              <option value="4:5" selected>4:5</option>
+              <option value="9:16">9:16</option>
+            </select>
+          </div>
+        </div>
+
+        <div
+          id="batch-editor-banner"
+          class="batch-editor-banner"
+          style="display: none;"
+        >
+          <div class="batch-editor-banner-left">
+            <div class="batch-editor-banner-title">
+              Editing: <span id="batch-editor-batch-name"></span>
+            </div>
+            <div
+              class="batch-editor-banner-subtitle"
+              id="batch-editor-batch-meta"
+            ></div>
+          </div>
+          <div class="batch-editor-banner-actions">
+            <button
+              class="btn btn-success"
+              id="batch-save-current-btn"
+              type="button"
+              disabled
+            >
+              💾 Save Batch
+            </button>
+            <button
+              class="btn btn-secondary"
+              id="batch-exit-editor-btn"
+              type="button"
+            >
+              ↩ Back to Batches
+            </button>
+          </div>
+        </div>
+
+        <div id="batch-list" class="batch-list"></div>
+
+        <template id="batch-item-template">
+          <div class="batch-item" data-batch-id="">
+            <div class="batch-item-header">
+              <div class="batch-item-title">
+                <div class="batch-item-name">Batch</div>
+                <span class="batch-badge batch-badge-needs">Needs files</span>
+              </div>
+              <div class="batch-item-actions">
+                <button
+                  class="btn btn-primary batch-edit-btn"
+                  type="button"
+                  title="Edit this batch using the editor below"
+                >
+                  Edit
+                </button>
+                <button
+                  class="btn btn-success batch-process-btn"
+                  type="button"
+                  title="Process just this batch"
+                  disabled
+                >
+                  Process
+                </button>
+                <button
+                  class="btn btn-danger batch-remove-btn"
+                  type="button"
+                  title="Remove batch"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+
+            <div class="batch-item-body">
+              <div class="batch-file-grid">
+                <div class="batch-file-field">
+                  <label class="batch-field-label">📹 Main video (.mp4)</label>
+                  <input type="file" class="batch-video-input" accept="video/*" />
+                  <div class="batch-file-name batch-video-name"></div>
+                </div>
+
+                <div class="batch-file-field">
+                  <label class="batch-field-label"
+                    >📝 Subtitle text (.txt)</label
+                  >
+                  <input
+                    type="file"
+                    class="batch-subtitle-input"
+                    accept=".txt,text/plain"
+                  />
+                  <div class="batch-file-name batch-subtitle-name"></div>
+                </div>
+
+                <div class="batch-file-field">
+                  <label class="batch-field-label"
+                    >🧠 Clip mapping (.txt / .json)</label
+                  >
+                  <input
+                    type="file"
+                    class="batch-mapping-input"
+                    accept=".txt,.json,application/json,text/plain"
+                  />
+                  <div class="batch-file-name batch-mapping-name"></div>
+                  <div class="batch-field-help">
+                    TXT format: <code>"Some phrase" -&gt; 4</code> (or use
+                    <code>→</code>). JSON format:
+                    <code>[{ "segment": "...", "clip": 4 }]</code>
+                  </div>
+                </div>
+              </div>
+
+              <div class="batch-log" aria-live="polite"></div>
+
+              <div class="batch-result" style="display: none;">
+                <div class="batch-result-preview">
+                  <video class="batch-preview" controls preload="metadata">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div class="batch-result-actions">
+                  <a
+                    class="btn btn-success batch-download-btn"
+                    href="#"
+                    target="_self"
+                    rel="noopener"
+                    >⬇️ Download</a
+                  >
+                  <a
+                    class="btn btn-secondary batch-s3-btn"
+                    href="#"
+                    target="_blank"
+                    rel="noopener"
+                    style="display: none;"
+                    >Open on S3</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </section>
+
       <!-- Step 1: Upload Main Video + Script + Mapping -->
       <section class="card" id="upload-section">
         <h2>Step 1: Upload Video & Script</h2>
@@ -487,5 +672,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='batch.js') }}"></script>
   </body>
 </html>

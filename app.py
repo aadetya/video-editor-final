@@ -338,7 +338,7 @@ def upload_video_with_txt():
         )
 
         # Read the transcript text and split by lines
-        transcript_text = txt_file.read().decode('utf-8')
+        transcript_text = txt_file.read().decode("utf-8", errors="replace")
         logger.info(
             "[UPLOAD_VIDEO_WITH_TXT] Transcript text length=%d",
             len(transcript_text),
@@ -349,36 +349,49 @@ def upload_video_with_txt():
             len(lines),
         )
 
-        # Generate transcript with evenly spaced timing
-        from video_overlay_script import probe_video_metadata, evenly_spaced_transcript
-        _, _, _, _, duration = probe_video_metadata(video_path)
-        print(f"[DEBUG] Video duration: {duration} seconds")
-
-        # Create full text from all lines
-        full_text = ' '.join(lines)
-        print(f"[DEBUG] Full text: {full_text[:100]}...")
-        transcript = evenly_spaced_transcript(full_text, duration)
-        print(f"[DEBUG] Generated transcript with {len(transcript)} words")
-
-        # Extract just the words for display
-        words = [entry['word'] for entry in transcript]
-
-        # Calculate subtitle boxes based on line breaks
+        # Fast path: build a transcript from the provided TXT only.
+        #
+        # We intentionally DO NOT run Whisper/WhisperX here so the UI stays responsive.
+        # Transcription + waveform alignment happens when the user clicks "Process video".
+        transcript = []
         subtitles = []
-        word_index = 0
-        for line in lines:
-            line_words = line.split()
-            word_count = len(line_words)
-            if word_count > 0:
-                subtitles.append({
-                    'text': line,
-                    'start_word': word_index,
-                    'end_word': word_index + word_count - 1,
-                    'word_count': word_count
-                })
-                word_index += word_count
+        word_cursor = 0
+        default_word_duration = 0.5
 
-        print(f"[DEBUG] Created {len(subtitles)} subtitle boxes")
+        for line in lines:
+            tokens = [tok for tok in line.split() if tok]
+            if not tokens:
+                continue
+
+            start_word = word_cursor
+            for idx, tok in enumerate(tokens):
+                t0 = (word_cursor + idx) * default_word_duration
+                t1 = t0 + default_word_duration
+                transcript.append({"word": tok, "start_time": t0, "end_time": t1})
+            word_cursor += len(tokens)
+            end_word = word_cursor - 1
+
+            subtitles.append(
+                {
+                    "text": line,
+                    "start_word": start_word,
+                    "end_word": end_word,
+                    "word_count": len(tokens),
+                }
+            )
+
+        if not transcript:
+            return jsonify({'error': 'Transcript file produced no words'}), 400
+
+        words = [entry['word'] for entry in transcript]
+        full_text = ' '.join(words)
+
+        logger.info(
+            "[UPLOAD_VIDEO_WITH_TXT] Prepared draft transcript (words=%d, subtitles=%d). "
+            "Transcription is deferred to processing.",
+            len(words),
+            len(subtitles),
+        )
 
         response_data = {
             'success': True,
@@ -389,14 +402,14 @@ def upload_video_with_txt():
             'subtitles': subtitles
         }
         logger.info(
-            "[UPLOAD_VIDEO_WITH_TXT] Returning generated evenly-spaced transcript"
+            "[UPLOAD_VIDEO_WITH_TXT] Returning draft transcript (words=%d, subtitles=%d)",
+            len(words),
+            len(subtitles),
         )
         return jsonify(response_data)
 
     except Exception as e:
-        import traceback
-        print("[ERROR] Exception in upload_video_with_txt:")
-        traceback.print_exc()
+        logger.exception("[UPLOAD_VIDEO_WITH_TXT] Error processing files")
         return jsonify({'error': f'Error processing files: {str(e)}'}), 500
 
 
@@ -466,6 +479,40 @@ def process_video():
         subtitle_sentences = data.get('subtitle_sentences', [])
         aspect_ratio = data.get('aspect_ratio', '4:5')  # Default to 4:5
 
+        def _safe_int(value):
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return None
+
+        # If the user creates manual highlights out of order in the editor, the
+        # backend mapping can clamp/skip earlier selections due to its monotonic
+        # cursor. Sort by word indices (when provided) so the mapping always
+        # runs chronologically.
+        if isinstance(highlights, list) and highlights:
+            indexed_highlights = list(enumerate(highlights))
+
+            def _highlight_sort_key(item):
+                original_index, highlight = item
+                if not isinstance(highlight, dict):
+                    return (1, original_index)
+                start_idx = _safe_int(highlight.get("start_word"))
+                end_idx = _safe_int(highlight.get("end_word"))
+                if start_idx is None and end_idx is None:
+                    return (1, original_index)
+                if start_idx is None:
+                    start_idx = end_idx
+                if end_idx is None:
+                    end_idx = start_idx
+                low = min(start_idx, end_idx)
+                high = max(start_idx, end_idx)
+                return (0, low, high, original_index)
+
+            highlights = [
+                highlight
+                for _, highlight in sorted(indexed_highlights, key=_highlight_sort_key)
+            ]
+
         logger.info(f"[REQUEST] Video path: {video_path}")
         logger.info(f"[REQUEST] Highlights: {len(highlights)}")
         logger.info(f"[REQUEST] Transcript words: {len(transcript)}")
@@ -515,11 +562,15 @@ def process_video():
                         text_value = item.get("text") or item.get("display_text") or item.get("phrase")
                         if not text_value:
                             continue
+                        phrase_value = item.get("phrase", text_value) or text_value
+                        occurrence_value = max(1, int(item.get("occurrence", 1) or 1))
+                        # Do not trust UI word indices here.
+                        # The render pipeline maps subtitle sentences onto the audio-aligned transcript.
                         sentences.append(
                             SubtitleSentence(
                                 text=text_value,
-                                phrase=item.get("phrase", text_value),
-                                occurrence=int(item.get("occurrence", 1)),
+                                phrase=phrase_value,
+                                occurrence=occurrence_value,
                             )
                         )
 
@@ -826,4 +877,3 @@ def save_project():
 if __name__ == '__main__':
     # Disable reloader to prevent server restarts during video processing
     app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
-

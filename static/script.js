@@ -1769,6 +1769,13 @@ async function processVideo() {
     }
     
 
+    // Allow batch UI (if loaded) to react to completed renders.
+    try {
+      window.dispatchEvent(new CustomEvent("batchVideoProcessed", { detail: data }));
+    } catch (e) {
+      console.warn("Failed to dispatch batchVideoProcessed event:", e);
+    }
+
     resultSection.style.display = "block";
     processProgress.style.display = "none";
   } catch (error) {
